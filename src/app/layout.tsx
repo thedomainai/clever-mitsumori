@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="description" content="商品カテゴリのカット品在庫を管理し、条件検索できるツール" />
       </head>
       <body className="bg-gray-50">
-        <div className="min-h-screen flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex flex-col max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <header className="py-4 flex items-center justify-between border-b border-gray-200">
             <h1 className="text-xl font-bold text-gray-900">
               在庫連動見積抽出ツール
