@@ -40,11 +40,15 @@ mtg-*.md
 
 # CSV data files (uploaded at runtime, not bundled)
 zaiko-*.csv
+!__tests__/fixtures/zaiko-*.csv
 
 # Test
 coverage/
 playwright-report/
 test-results/
+
+# TypeScript incremental compilation
+tsconfig.tsbuildinfo
 
 # Misc
 *.log
