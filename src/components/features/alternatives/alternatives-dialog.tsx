@@ -24,31 +24,33 @@ export default function AlternativesDialog({
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose} title="代替品候補">
-      <div className="space-y-4">
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-semibold text-gray-900 mb-2">対象商品</h4>
-          <div className="text-sm text-gray-700">
-            <p>品番: {targetProduct.productCode}</p>
-            <p>幅: {targetProduct.width}mm</p>
-            {targetProduct.meshSize && <p>目開き: {targetProduct.meshSize}μ</p>}
-            {targetProduct.material && <p>材質: {targetProduct.material}</p>}
-            {targetProduct.color && <p>カラー: {targetProduct.color}</p>}
+      <div className="space-y-5">
+        <div className="bg-slate-50 p-4 rounded-xl">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">対象商品</p>
+          <p className="font-semibold text-slate-900">{targetProduct.productCode}</p>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-600">
+            <span>幅: {targetProduct.width}mm</span>
+            {targetProduct.meshSize && <span>目開き: {targetProduct.meshSize}μ</span>}
+            {targetProduct.material && <span>材質: {targetProduct.material}</span>}
+            {targetProduct.color && <span>カラー: {targetProduct.color}</span>}
           </div>
         </div>
 
         {isLoading ? (
-          <div className="py-8">
+          <div className="py-12">
             <LoadingSpinner size="lg" />
           </div>
         ) : alternatives.length > 0 ? (
           <div className="space-y-3">
-            <h4 className="font-semibold text-gray-900">代替品リスト</h4>
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+              候補 ({alternatives.length}件)
+            </p>
             {alternatives.map((alternative, index) => (
               <AlternativeCard key={index} alternative={alternative} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-12 text-sm text-slate-500">
             代替品が見つかりませんでした
           </div>
         )}

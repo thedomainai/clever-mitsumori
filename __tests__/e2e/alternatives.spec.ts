@@ -32,7 +32,7 @@ test.describe('代替品機能', () => {
       await expect(page.locator('text=対象商品')).toBeVisible()
 
       // 代替品リストまたは「代替品が見つかりませんでした」が表示される
-      const hasAlternativesList = await page.locator('text=代替品リスト').isVisible()
+      const hasAlternativesList = await page.locator('text=候補').first().isVisible()
       const hasNoAlternatives = await page.locator('text=代替品が見つかりませんでした').isVisible()
 
       expect(hasAlternativesList || hasNoAlternatives).toBeTruthy()
@@ -102,7 +102,7 @@ test.describe('代替品機能', () => {
       await expect(page.locator('text=代替品候補')).toBeVisible()
 
       // オーバーレイ（背景）をクリック
-      const overlay = page.locator('.fixed.inset-0.bg-black.bg-opacity-50')
+      const overlay = page.locator('.backdrop-blur-sm')
       await overlay.click({ position: { x: 10, y: 10 } })
 
       // ダイアログが閉じる
@@ -185,11 +185,10 @@ test.describe('代替品機能', () => {
 
       // 対象商品の詳細が表示される
       await expect(page.locator('text=対象商品')).toBeVisible()
-      await expect(page.locator('text=品番:').first()).toBeVisible()
       await expect(page.locator('text=幅:').first()).toBeVisible()
 
       // 代替品リストが表示される場合、その内容を確認
-      const hasAlternativesList = await page.locator('text=代替品リスト').isVisible()
+      const hasAlternativesList = await page.locator('text=候補').first().isVisible()
 
       if (hasAlternativesList) {
         // 代替品カードが存在することを確認

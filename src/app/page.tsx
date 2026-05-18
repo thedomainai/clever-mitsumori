@@ -15,6 +15,11 @@ export default function Home() {
 
   return (
     <div className="space-y-6">
+      <div>
+        <h1 className="text-lg font-semibold text-slate-900">データ取込</h1>
+        <p className="mt-1 text-sm text-slate-500">在庫CSVファイルをアップロードして、商品データを更新します</p>
+      </div>
+
       <CsvUploadForm onUploadSuccess={reload} />
 
       <InventorySummary

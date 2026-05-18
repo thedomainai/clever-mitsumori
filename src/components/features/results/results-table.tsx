@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { SearchResult, UnifiedProduct } from '@/lib/types'
 import { Table, TableHeader } from '@/components/ui/table'
 import ResultsRow from './results-row'
@@ -42,27 +41,34 @@ export default function ResultsTable({
     { key: 'stockQuantity', label: '在庫(m)' },
     { key: 'purchasePrice', label: '仕入値(/m)' },
     { key: 'unitPrice', label: 'EC参考単価' },
-    { key: 'inventoryStatus', label: '在庫ステータス' },
-    { key: 'actions', label: '操作' },
+    { key: 'inventoryStatus', label: 'ステータス' },
+    { key: 'actions', label: '' },
   ]
 
   if (results.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
-        検索結果がありません
+      <div className="flex items-center justify-center py-16">
+        <div className="text-center">
+          <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
+            <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          </div>
+          <p className="text-sm text-slate-500">検索結果がありません</p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg shadow-md p-4">
-        <p className="text-sm text-gray-600">
-          検索結果: <span className="font-semibold">{totalResults}件</span>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-slate-600">
+          検索結果: <span className="font-semibold text-slate-900">{totalResults}件</span>
         </p>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <Table
           headers={headers.map((header) => (
             <TableHeader

@@ -1,7 +1,6 @@
 'use client'
 
 import Card from '@/components/ui/card'
-import Button from '@/components/ui/button'
 
 export interface InventorySummaryProps {
   meshCount: number
@@ -21,7 +20,7 @@ export default function InventorySummary({
   onClearData,
 }: InventorySummaryProps) {
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return '未設定'
+    if (!dateString) return '-'
     const date = new Date(dateString)
     return date.toLocaleString('ja-JP', {
       year: 'numeric',
@@ -32,35 +31,35 @@ export default function InventorySummary({
     })
   }
 
+  const stats = [
+    { label: 'メッシュ', value: meshCount, color: 'bg-indigo-50 text-indigo-700' },
+    { label: 'ネトロン', value: netoronCount, color: 'bg-emerald-50 text-emerald-700' },
+    { label: 'トリカル', value: trikaruCount, color: 'bg-violet-50 text-violet-700' },
+    { label: '合計', value: totalCount, color: 'bg-slate-100 text-slate-700' },
+  ]
+
   return (
     <Card title="現在の在庫データ">
       <div className="space-y-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">メッシュ</p>
-            <p className="text-2xl font-bold text-blue-900">{meshCount}件</p>
-          </div>
-          <div className="bg-green-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">ネトロン</p>
-            <p className="text-2xl font-bold text-green-900">{netoronCount}件</p>
-          </div>
-          <div className="bg-purple-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">トリカル</p>
-            <p className="text-2xl font-bold text-purple-900">{trikaruCount}件</p>
-          </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">合計</p>
-            <p className="text-2xl font-bold text-gray-900">{totalCount}件</p>
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {stats.map((stat) => (
+            <div key={stat.label} className={`px-4 py-3 rounded-lg ${stat.color}`}>
+              <p className="text-xs font-medium opacity-70">{stat.label}</p>
+              <p className="text-xl font-bold mt-0.5">{stat.value}件</p>
+            </div>
+          ))}
         </div>
 
-        <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-          <div className="text-sm text-gray-600">
-            最終更新: <span className="font-medium">{formatDate(lastUpdated)}</span>
-          </div>
-          <Button variant="danger" size="sm" onClick={onClearData}>
+        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          <p className="text-xs text-slate-500">
+            最終更新: {formatDate(lastUpdated)}
+          </p>
+          <button
+            onClick={onClearData}
+            className="text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 px-2.5 py-1.5 rounded-md transition-colors"
+          >
             データクリア
-          </Button>
+          </button>
         </div>
       </div>
     </Card>

@@ -18,43 +18,54 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>在庫連動見積抽出ツール</title>
+        <title>Clever - 在庫連動見積抽出</title>
         <meta name="description" content="商品カテゴリのカット品在庫を管理し、条件検索できるツール" />
       </head>
-      <body className="bg-gray-50">
-        <div className="min-h-screen flex flex-col max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <header className="py-4 flex items-center justify-between border-b border-gray-200">
-            <h1 className="text-xl font-bold text-gray-900">
-              在庫連動見積抽出ツール
-            </h1>
-            <nav className="flex space-x-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`
-                    px-4 py-2 rounded-md font-medium text-sm transition-colors
-                    ${
-                      pathname === item.href
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }
-                  `}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+      <body className="bg-slate-50 antialiased">
+        <div className="min-h-screen flex flex-col">
+          <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-slate-200/60">
+            <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+                  </svg>
+                </div>
+                <span className="text-[15px] font-semibold text-slate-900 tracking-tight">Clever</span>
+              </div>
+              <nav className="flex items-center gap-1">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`
+                      px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
+                      ${
+                        pathname === item.href
+                          ? 'bg-slate-900 text-white'
+                          : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                      }
+                    `}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
           </header>
 
-          <main className="flex-1 py-8">
-            {children}
+          <main className="flex-1">
+            <div className="max-w-5xl mx-auto px-6 py-8">
+              {children}
+            </div>
           </main>
 
-          <footer className="border-t border-gray-200 py-4">
-            <p className="text-center text-sm text-gray-500">
-              © 2026 在庫連動見積抽出ツール
-            </p>
+          <footer className="border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-6 py-4">
+              <p className="text-center text-xs text-slate-400">
+                Clever - 在庫連動見積抽出ツール
+              </p>
+            </div>
           </footer>
         </div>
       </body>

@@ -8,12 +8,8 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {
-        excess: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          500: '#ef4444',
-        },
+      fontFamily: {
+        sans: ['Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'system-ui', 'sans-serif'],
       },
     },
   },

@@ -46,7 +46,7 @@ export default function SearchPage() {
 
   if (isLoadingInventory) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <LoadingSpinner size="lg" />
       </div>
     )
@@ -54,11 +54,15 @@ export default function SearchPage() {
 
   if (products.length === 0) {
     return (
-      <div>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-          <p className="text-yellow-800 font-medium">
-            在庫データがありません。CSV取込ページからデータをアップロードしてください。
-          </p>
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <div className="text-center">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-amber-50 flex items-center justify-center">
+            <svg className="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-slate-900">在庫データがありません</p>
+          <p className="mt-1 text-sm text-slate-500">CSV取込ページからデータをアップロードしてください</p>
         </div>
       </div>
     )
@@ -66,6 +70,11 @@ export default function SearchPage() {
 
   return (
     <div className="space-y-6">
+      <div>
+        <h1 className="text-lg font-semibold text-slate-900">商品検索</h1>
+        <p className="mt-1 text-sm text-slate-500">条件を指定して在庫商品を検索します</p>
+      </div>
+
       <SearchForm onSearch={handleSearch} />
 
       <ResultsTable

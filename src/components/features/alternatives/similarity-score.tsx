@@ -8,15 +8,15 @@ export default function SimilarityScore({ score }: SimilarityScoreProps) {
   const percentage = Math.round(score * 100)
 
   const getColor = () => {
-    if (percentage >= 90) return 'bg-green-100 text-green-800'
-    if (percentage >= 70) return 'bg-blue-100 text-blue-800'
-    if (percentage >= 50) return 'bg-yellow-100 text-yellow-800'
-    return 'bg-gray-100 text-gray-800'
+    if (percentage >= 90) return 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20'
+    if (percentage >= 70) return 'bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-600/20'
+    if (percentage >= 50) return 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20'
+    return 'bg-slate-50 text-slate-600 ring-1 ring-inset ring-slate-500/10'
   }
 
   return (
-    <div className={`px-3 py-1 rounded-full text-xs font-semibold ${getColor()}`}>
-      類似度: {percentage}%
+    <div className={`px-2.5 py-1 rounded-md text-xs font-semibold ${getColor()}`}>
+      {percentage}%
     </div>
   )
 }

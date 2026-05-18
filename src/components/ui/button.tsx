@@ -2,7 +2,7 @@
 
 import { ButtonHTMLAttributes, forwardRef } from 'react'
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger'
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
 export type ButtonSize = 'sm' | 'md' | 'lg'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -13,50 +13,30 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', loading = false, disabled, className = '', children, ...props }, ref) => {
-    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+    const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed'
 
     const variantClasses: Record<ButtonVariant, string> = {
-      primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500',
-      secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-400',
-      danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500',
+      primary: 'bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white shadow-sm focus-visible:outline-indigo-600',
+      secondary: 'bg-white ring-1 ring-inset ring-slate-300 hover:bg-slate-50 active:bg-slate-100 text-slate-700 focus-visible:outline-indigo-600',
+      danger: 'bg-red-600 hover:bg-red-500 active:bg-red-700 text-white shadow-sm focus-visible:outline-red-600',
+      ghost: 'hover:bg-slate-100 active:bg-slate-200 text-slate-600 focus-visible:outline-indigo-600',
     }
 
     const sizeClasses: Record<ButtonSize, string> = {
-      sm: 'px-3 py-1.5 text-sm',
-      md: 'px-4 py-2 text-base',
-      lg: 'px-6 py-3 text-lg',
+      sm: 'px-2.5 py-1.5 text-xs rounded-md gap-1.5',
+      md: 'px-3.5 py-2 text-sm rounded-lg gap-2',
+      lg: 'px-4 py-2.5 text-sm rounded-lg gap-2',
     }
-
-    const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`
 
     return (
       <button
         ref={ref}
-        className={classes}
+        className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
         disabled={disabled || loading}
         {...props}
       >
         {loading && (
-          <svg
-            className="animate-spin -ml-1 mr-2 h-4 w-4"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
+          <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
         )}
         {children}
       </button>

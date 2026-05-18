@@ -17,19 +17,19 @@ export default function ProductTypeSelector({ value, onChange }: ProductTypeSele
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">商品タイプ</label>
-      <div className="flex gap-2">
+      <label className="block text-xs font-medium text-slate-600 mb-1.5">商品タイプ</label>
+      <div className="inline-flex rounded-lg bg-slate-100 p-1">
         {options.map((option) => (
           <button
             key={option.value}
             type="button"
             onClick={() => onChange(option.value)}
             className={`
-              px-4 py-2 rounded-md font-medium text-sm transition-colors
+              px-3.5 py-1.5 rounded-md text-sm font-medium transition-all duration-150
               ${
                 value === option.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
               }
             `}
           >

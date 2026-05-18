@@ -35,45 +35,25 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
   const handleSearch = () => {
     const filters: SearchFilter = {}
 
-    if (productType !== 'all') {
-      filters.productType = productType as ProductType
-    }
-
-    if (productCode) {
-      filters.productCode = productCode
-    }
-
-    if (commonKey) {
-      filters.commonKey = commonKey
-    }
-
-    if (material && productType === 'mesh') {
-      filters.material = material
-    }
-
+    if (productType !== 'all') filters.productType = productType as ProductType
+    if (productCode) filters.productCode = productCode
+    if (commonKey) filters.commonKey = commonKey
+    if (material && productType === 'mesh') filters.material = material
     if ((meshSizeMin || meshSizeMax) && productType === 'mesh') {
       filters.meshSize = {}
       if (meshSizeMin) filters.meshSize.min = parseFloat(meshSizeMin)
       if (meshSizeMax) filters.meshSize.max = parseFloat(meshSizeMax)
     }
-
-    if (meshCount && productType === 'mesh') {
-      filters.meshCount = meshCount
-    }
-
+    if (meshCount && productType === 'mesh') filters.meshCount = meshCount
     if (widthMin || widthMax) {
       filters.width = {}
       if (widthMin) filters.width.min = parseFloat(widthMin)
       if (widthMax) filters.width.max = parseFloat(widthMax)
     }
-
     if (color && (productType === 'netoron' || productType === 'trikaru' || productType === 'all')) {
       filters.color = color
     }
-
-    if (inventoryStatus !== 'all') {
-      filters.inventoryStatus = inventoryStatus as InventoryStatus
-    }
+    if (inventoryStatus !== 'all') filters.inventoryStatus = inventoryStatus as InventoryStatus
 
     onSearch(filters)
   }
@@ -97,97 +77,35 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
 
   return (
     <Card title="検索条件">
-      <div className="space-y-4">
+      <div className="space-y-5">
         <ProductTypeSelector value={productType} onChange={setProductType} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="品番"
-            type="text"
-            placeholder="部分一致"
-            value={productCode}
-            onChange={(e) => setProductCode(e.target.value)}
-          />
-
-          <Input
-            label="共通キー"
-            type="text"
-            value={commonKey}
-            onChange={(e) => setCommonKey(e.target.value)}
-          />
-
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Input label="品番" type="text" placeholder="部分一致" value={productCode} onChange={(e) => setProductCode(e.target.value)} />
+          <Input label="共通キー" type="text" value={commonKey} onChange={(e) => setCommonKey(e.target.value)} />
           {showMeshFields && (
-            <Input
-              label="材質"
-              type="text"
-              value={material}
-              onChange={(e) => setMaterial(e.target.value)}
-            />
+            <Input label="材質" type="text" value={material} onChange={(e) => setMaterial(e.target.value)} />
           )}
-
           {showMeshFields && (
-            <>
-              <div className="flex gap-2">
-                <Input
-                  label="目開き(μ) 最小"
-                  type="number"
-                  placeholder="最小"
-                  value={meshSizeMin}
-                  onChange={(e) => setMeshSizeMin(e.target.value)}
-                />
-                <Input
-                  label="目開き(μ) 最大"
-                  type="number"
-                  placeholder="最大"
-                  value={meshSizeMax}
-                  onChange={(e) => setMeshSizeMax(e.target.value)}
-                />
-              </div>
-
-              <Input
-                label="メッシュor線径"
-                type="text"
-                value={meshCount}
-                onChange={(e) => setMeshCount(e.target.value)}
-              />
-            </>
+            <div className="flex gap-2">
+              <Input label="目開き(μ) 最小" type="number" placeholder="最小" value={meshSizeMin} onChange={(e) => setMeshSizeMin(e.target.value)} />
+              <Input label="目開き(μ) 最大" type="number" placeholder="最大" value={meshSizeMax} onChange={(e) => setMeshSizeMax(e.target.value)} />
+            </div>
           )}
-
+          {showMeshFields && (
+            <Input label="メッシュor線径" type="text" value={meshCount} onChange={(e) => setMeshCount(e.target.value)} />
+          )}
           <div className="flex gap-2">
-            <Input
-              label="幅(mm) 最小"
-              type="number"
-              placeholder="最小"
-              value={widthMin}
-              onChange={(e) => setWidthMin(e.target.value)}
-            />
-            <Input
-              label="幅(mm) 最大"
-              type="number"
-              placeholder="最大"
-              value={widthMax}
-              onChange={(e) => setWidthMax(e.target.value)}
-            />
+            <Input label="幅(mm) 最小" type="number" placeholder="最小" value={widthMin} onChange={(e) => setWidthMin(e.target.value)} />
+            <Input label="幅(mm) 最大" type="number" placeholder="最大" value={widthMax} onChange={(e) => setWidthMax(e.target.value)} />
           </div>
-
           {showColorField && (
-            <Input
-              label="カラー"
-              type="text"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-            />
+            <Input label="カラー" type="text" value={color} onChange={(e) => setColor(e.target.value)} />
           )}
-
-          <Select
-            label="在庫ステータス"
-            options={inventoryStatusOptions}
-            value={inventoryStatus}
-            onChange={(e) => setInventoryStatus(e.target.value as InventoryStatus | 'all')}
-          />
+          <Select label="在庫ステータス" options={inventoryStatusOptions} value={inventoryStatus} onChange={(e) => setInventoryStatus(e.target.value as InventoryStatus | 'all')} />
         </div>
 
-        <div className="flex gap-2 pt-4">
+        <div className="flex gap-2 pt-2">
           <Button variant="primary" size="md" onClick={handleSearch} className="flex-1">
             検索
           </Button>

@@ -17,7 +17,7 @@ export default function ResultsRow({ result, onShowAlternatives }: ResultsRowPro
   const isExcess = product.inventoryStatus === 'EXCESS'
   const isOutOfStock = product.inventoryStatus === 'DELIVERY_INQUIRY'
 
-  const rowClassName = isExcess ? 'bg-red-50' : ''
+  const rowClassName = isExcess ? 'bg-red-50/50' : ''
 
   const getCategoryLabel = (type: string) => {
     const labels: Record<string, string> = {
@@ -37,18 +37,20 @@ export default function ResultsRow({ result, onShowAlternatives }: ResultsRowPro
 
   return (
     <TableRow className={rowClassName}>
-      <TableCell>{product.productCode}</TableCell>
+      <TableCell className="font-medium text-slate-900">{product.productCode}</TableCell>
       <TableCell>{product.commonKey || '-'}</TableCell>
-      <TableCell>{getCategoryLabel(product.productType)}</TableCell>
+      <TableCell>
+        <span className="text-xs font-medium text-slate-500">{getCategoryLabel(product.productType)}</span>
+      </TableCell>
       <TableCell>{getMaterialOrColor()}</TableCell>
       <TableCell>{product.meshSize ? `${product.meshSize}μ` : '-'}</TableCell>
       <TableCell>{product.width}mm</TableCell>
       <TableCell>{product.meshCount || '-'}</TableCell>
-      <TableCell className="text-right">{product.stockQuantity.toFixed(1)}</TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-right tabular-nums">{product.stockQuantity.toFixed(1)}</TableCell>
+      <TableCell className="text-right tabular-nums">
         <PriceDisplay price={product.purchasePrice} />
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-right tabular-nums font-medium">
         <PriceDisplay price={calculatedPrice.unitPrice} />
       </TableCell>
       <TableCell>
