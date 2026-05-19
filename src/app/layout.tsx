@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="bg-slate-50 antialiased">
         <div className="min-h-screen flex flex-col">
           <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-slate-200/60">
-            <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
                   <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -55,13 +55,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </header>
 
           <main className="flex-1">
-            <div className="max-w-5xl mx-auto px-6 py-8">
+            <div className="max-w-7xl mx-auto px-6 py-8">
               {children}
             </div>
           </main>
 
           <footer className="border-t border-slate-100">
-            <div className="max-w-5xl mx-auto px-6 py-4">
+            <div className="max-w-7xl mx-auto px-6 py-4">
               <p className="text-center text-xs text-slate-400">
                 Clever - 在庫連動見積抽出ツール
               </p>
