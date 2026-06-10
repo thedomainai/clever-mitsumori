@@ -10,7 +10,7 @@ export default function DataFlowConfirmPage() {
       {/* ===== HEADER ===== */}
       <div className="mb-10">
         <div className="flex items-center gap-3 mb-2">
-          <span className="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full">確認資料</span>
+          <span className="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded">確認資料</span>
           <span className="text-sm text-slate-400">6/18 MTG 確認予定</span>
         </div>
         <h1 className="text-2xl font-black text-slate-900 tracking-tight">Clever — データの流れと確認事項</h1>
@@ -19,7 +19,7 @@ export default function DataFlowConfirmPage() {
           EC販売価格の算出・商品検索に使われるかの全体像をご説明します。
         </p>
         <div className="mt-4 flex gap-3">
-          <Link href="/dataflow" className="text-xs text-indigo-600 hover:text-indigo-800 underline underline-offset-2">
+          <Link href="/dataflow" className="text-xs text-slate-600 hover:text-slate-800 underline underline-offset-2">
             開発者向けデータフロー図を見る
           </Link>
         </div>
@@ -28,7 +28,7 @@ export default function DataFlowConfirmPage() {
       {/* ===== TOOL PURPOSE ===== */}
       <Section>
         <SectionHeader num="0" title="このツールでできること" />
-        <div className="bg-indigo-50/60 border border-indigo-200 rounded-xl p-5">
+        <div className="bg-slate-50/60 border border-slate-200 rounded-lg p-5">
           <p className="text-[15px] text-slate-800 leading-relaxed">
             くればぁ様がスプレッドシートで管理されている<strong>メッシュ・ネトロン・トリカルの在庫データ（CSV）</strong>をツールに取り込み、
             営業担当の方がブラウザ上で<strong>商品検索</strong>・<strong>EC販売価格の確認</strong>・<strong>在庫切れ時の代替品提案</strong>を行えるようにします。
@@ -127,8 +127,8 @@ export default function DataFlowConfirmPage() {
           color="violet"
           desc="変換されたデータは、お使いのブラウザ内に保存されます。サーバーへの送信やインターネット接続は不要です。"
         >
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <p className="text-sm text-amber-800">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <p className="text-sm text-slate-700">
               <strong>ご注意:</strong> データはブラウザ内に保存されるため、
               ブラウザのキャッシュを削除すると消えます。
               最新のCSVファイルを再度アップロードすれば復元できます。
@@ -172,19 +172,19 @@ export default function DataFlowConfirmPage() {
                   <p className="text-sm text-slate-700 font-semibold text-center py-1">販売単価 = 仕入値 x 1.5</p>
                   <p className="text-xs text-slate-400 mt-1 text-center">（暫定。正式な計算式に置き換え予定）</p>
                 </div>
-                <div className="p-3 bg-amber-50 border border-amber-300 rounded-lg">
+                <div className="p-3 bg-slate-50 border border-slate-300 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <p className="text-xs font-bold text-amber-700">6/9 MTG で合意した計算式</p>
-                    <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded border border-amber-300">実装待ち</span>
+                    <p className="text-xs font-bold text-slate-700">6/9 MTG で合意した計算式</p>
+                    <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded border border-slate-300">実装待ち</span>
                   </div>
-                  <div className="bg-white rounded border border-amber-200 p-2 text-center">
+                  <div className="bg-white rounded border border-slate-200 p-2 text-center">
                     <p className="text-sm font-bold text-slate-900">
                       販売価格 = (仕入単価 x カット長 + 固定費) / (1 - 粗利率)
                     </p>
                   </div>
                   <div className="mt-2 space-y-1 text-xs text-slate-600">
-                    <p><strong>仕入単価:</strong> CSVの仕入値 <span className="text-rose-500 font-semibold">→ 確認B</span></p>
-                    <p><strong>カット長:</strong> <span className="text-rose-500 font-semibold">データの所在が未定 → 確認D</span></p>
+                    <p><strong>仕入単価:</strong> CSVの仕入値 <span className="text-slate-800 font-semibold">→ 確認B</span></p>
+                    <p><strong>カット長:</strong> <span className="text-slate-800 font-semibold">データの所在が未定 → 確認D</span></p>
                     <p><strong>固定費:</strong> 6,000円（デフォルト / 商品ごとに変更可）</p>
                     <p><strong>粗利率:</strong> 約50%（デフォルト / 全商品共通）</p>
                   </div>
@@ -208,9 +208,9 @@ export default function DataFlowConfirmPage() {
                     <SimilarityRow label="仕入値の近さ" pct={10} />
                   </div>
                 </div>
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg">
-                  <p className="text-xs font-bold text-rose-600 mb-1">ご注意（確認E）</p>
-                  <p className="text-xs text-rose-600 leading-relaxed">
+                <div className="p-3 bg-slate-50 border border-slate-300 rounded-lg">
+                  <p className="text-xs font-bold text-slate-700 mb-1">ご注意（確認E）</p>
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     ネトロン・トリカルには「目開き」データがないため、
                     類似度スコアの40%分が常にゼロになります。
                     代替基準の調整が必要になる可能性があります。
@@ -374,7 +374,7 @@ function Section({ children }: { children: ReactNode }) {
 function SectionHeader({ num, title }: { num: string; title: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">{num}</div>
+      <div className="w-9 h-9 rounded bg-slate-900 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">{num}</div>
       <h2 className="text-xl font-bold text-slate-900">{title}</h2>
     </div>
   )
@@ -383,9 +383,9 @@ function SectionHeader({ num, title }: { num: string; title: string }) {
 /* ---- Feature Card ---- */
 function FeatureCard({ icon, title, desc }: { icon: ReactNode; title: string; desc: string }) {
   return (
-    <div className="bg-white border border-indigo-100 rounded-lg p-4">
+    <div className="bg-white border border-slate-200 rounded-lg p-4">
       <div className="flex items-center gap-2 mb-2">
-        <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0">{icon}</div>
+        <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-slate-600 flex-shrink-0">{icon}</div>
         <p className="text-sm font-bold text-slate-800">{title}</p>
       </div>
       <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
@@ -394,21 +394,13 @@ function FeatureCard({ icon, title, desc }: { icon: ReactNode; title: string; de
 }
 
 /* ---- Flow Step ---- */
-function FlowStep({ num, title, color, desc, children }: {
-  num: string; title: string; color: string; desc: string; children: ReactNode
+function FlowStep({ num, title, desc, children }: {
+  num: string; title: string; color?: string; desc: string; children: ReactNode
 }) {
-  const borderColor: Record<string, string> = {
-    blue: 'border-blue-400', emerald: 'border-emerald-400', violet: 'border-violet-400',
-    amber: 'border-amber-400', indigo: 'border-indigo-400',
-  }
-  const dotColor: Record<string, string> = {
-    blue: 'bg-blue-500', emerald: 'bg-emerald-500', violet: 'bg-violet-500',
-    amber: 'bg-amber-500', indigo: 'bg-indigo-500',
-  }
   return (
-    <div className={`border-l-4 ${borderColor[color]} rounded-xl bg-white p-5 shadow-sm`}>
+    <div className="rounded-lg bg-white p-5 shadow-sm border border-slate-200">
       <div className="flex items-center gap-3 mb-3">
-        <div className={`w-8 h-8 rounded-lg ${dotColor[color]} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}>
+        <div className="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
           {num}
         </div>
         <div>
@@ -434,12 +426,11 @@ function FlowConnector() {
 }
 
 /* ---- CSV Card ---- */
-function CsvCard({ name, file, color, items }: { name: string; file: string; color: string; items: string[] }) {
-  const tagBg: Record<string, string> = { blue: 'bg-blue-100 text-blue-700', emerald: 'bg-emerald-100 text-emerald-700', violet: 'bg-violet-100 text-violet-700' }
+function CsvCard({ name, file, items }: { name: string; file: string; color?: string; items: string[] }) {
   return (
     <div className="bg-white border border-slate-200 rounded-lg p-3">
       <div className="flex items-center gap-2 mb-2">
-        <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${tagBg[color]}`}>{name}</span>
+        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 text-slate-600">{name}</span>
       </div>
       <p className="text-xs text-slate-400 font-mono mb-2">{file}</p>
       <div className="flex flex-wrap gap-1">
@@ -455,7 +446,7 @@ function CsvCard({ name, file, color, items }: { name: string; file: string; col
 function AutoStep({ text }: { text: string }) {
   return (
     <div className="flex items-start gap-2 text-xs text-slate-600">
-      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5" />
+      <span className="w-1.5 h-1.5 rounded-full bg-slate-400 flex-shrink-0 mt-1.5" />
       <span>{text}</span>
     </div>
   )
@@ -463,8 +454,8 @@ function AutoStep({ text }: { text: string }) {
 
 /* ---- Status Row ---- */
 function StatusRow({ color, label, condition }: { color: string; label: string; condition: string }) {
-  const dotColor: Record<string, string> = { red: 'bg-red-400', amber: 'bg-amber-400', emerald: 'bg-emerald-400' }
-  const textColor: Record<string, string> = { red: 'text-red-600', amber: 'text-amber-600', emerald: 'text-emerald-600' }
+  const dotColor: Record<string, string> = { red: 'bg-slate-800', amber: 'bg-slate-500', emerald: 'bg-slate-300' }
+  const textColor: Record<string, string> = { red: 'text-slate-800', amber: 'text-slate-600', emerald: 'text-slate-500' }
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-1.5 w-24 flex-shrink-0">
@@ -481,11 +472,11 @@ function ProcessCard({ letter, title, desc, warn, children }: {
   letter: string; title: string; desc: string; warn?: boolean; children: ReactNode
 }) {
   return (
-    <div className={`bg-white border ${warn ? 'border-amber-300' : 'border-slate-200'} rounded-lg p-4`}>
+    <div className={`bg-white border ${warn ? 'border-slate-300' : 'border-slate-200'} rounded-lg p-4`}>
       <div className="flex items-center gap-2 mb-1">
-        <span className="w-6 h-6 rounded bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center flex-shrink-0">{letter}</span>
+        <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center flex-shrink-0">{letter}</span>
         <h4 className="text-sm font-bold text-slate-800">{title}</h4>
-        {warn && <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded border border-amber-200">要確認あり</span>}
+        {warn && <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded border border-slate-300">要確認あり</span>}
       </div>
       <p className="text-xs text-slate-500 mb-2">{desc}</p>
       {children}
@@ -499,7 +490,7 @@ function SimilarityRow({ label, pct, note }: { label: string; pct: number; note?
     <div className="flex items-center gap-2 text-xs">
       <span className="w-8 text-right font-bold text-slate-600 flex-shrink-0">{pct}%</span>
       <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden flex-shrink-0">
-        <div className="h-full rounded-full bg-amber-400" style={{ width: `${pct}%` }} />
+        <div className="h-full rounded-full bg-slate-400" style={{ width: `${pct}%` }} />
       </div>
       <span className="text-slate-600">{label}</span>
       {note && <span className="text-slate-400">({note})</span>}
@@ -511,7 +502,7 @@ function SimilarityRow({ label, pct, note }: { label: string; pct: number; note?
 function ResultItem({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-2 text-xs text-slate-600">
-      <span className="w-1 h-1 rounded-full bg-indigo-400 flex-shrink-0" />
+      <span className="w-1 h-1 rounded-full bg-slate-400 flex-shrink-0" />
       <span>{label}</span>
     </div>
   )
@@ -522,22 +513,16 @@ function ConfirmItem({ id, title, status, question, background, who }: {
   id: string; title: string; status: string; question: string; background: ReactNode; who: string
 }) {
   const statusStyle = status === '未確認'
-    ? 'bg-rose-50 text-rose-600 border-rose-200'
+    ? 'bg-slate-800 text-white border-slate-800'
     : status === '確認中'
-      ? 'bg-amber-50 text-amber-600 border-amber-200'
-      : 'bg-emerald-50 text-emerald-600 border-emerald-200'
-
-  const borderStyle = status === '未確認'
-    ? 'border-rose-300'
-    : status === '確認中'
-      ? 'border-amber-300'
-      : 'border-emerald-300'
+      ? 'bg-slate-100 text-slate-600 border-slate-300'
+      : 'bg-white text-slate-500 border-slate-300'
 
   return (
-    <div className={`border ${borderStyle} rounded-xl p-5`}>
+    <div className="border border-slate-200 rounded-lg p-5">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 text-sm font-bold flex items-center justify-center flex-shrink-0">{id}</span>
+          <span className="w-8 h-8 rounded bg-slate-100 text-slate-700 text-sm font-bold flex items-center justify-center flex-shrink-0">{id}</span>
           <h4 className="text-base font-bold text-slate-900">{title}</h4>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">

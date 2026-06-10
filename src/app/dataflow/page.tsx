@@ -186,19 +186,19 @@ export default function DataFlowPage() {
               <PipeStep num="E" title="在庫ステータス判定" color="emerald" isLast>
                 <div className="space-y-1 text-[11px]">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-slate-800 flex-shrink-0" />
                     <span className="text-slate-600">残り = 0 →</span>
-                    <span className="font-semibold text-red-600">納期確認</span>
+                    <span className="font-semibold text-slate-800">納期確認</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-slate-500 flex-shrink-0" />
                     <span className="text-slate-600">残り ≥ 150m →</span>
-                    <span className="font-semibold text-amber-600">余剰在庫</span>
+                    <span className="font-semibold text-slate-600">余剰在庫</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-slate-300 flex-shrink-0" />
                     <span className="text-slate-600">上記以外 →</span>
-                    <span className="font-semibold text-emerald-600">在庫あり</span>
+                    <span className="font-semibold text-slate-500">在庫あり</span>
                   </div>
                 </div>
                 <p className="text-[9px] text-slate-400 mt-1">150m = 3反（1反=50m）</p>
@@ -222,7 +222,7 @@ export default function DataFlowPage() {
         <Stage num="3" title="統合データモデル & ストレージ" desc="3種のCSVを1つの型に統合し、ブラウザ内に保存" color="violet">
           <div className="grid grid-cols-3 gap-4">
             {/* UnifiedProduct */}
-            <div className="col-span-2 bg-violet-50/50 border border-violet-200 rounded-xl p-4">
+            <div className="col-span-2 bg-slate-50/50 border border-slate-200 rounded-lg p-4">
               <h4 className="text-[14px] font-bold text-slate-900 mb-0.5">UnifiedProduct</h4>
               <p className="text-[10px] text-slate-500 mb-3">1行 = 1商品。全カテゴリ共通の型定義</p>
 
@@ -258,18 +258,18 @@ export default function DataFlowPage() {
             </div>
 
             {/* localStorage */}
-            <div className="bg-violet-50/50 border border-violet-200 rounded-xl p-4">
+            <div className="bg-slate-50/50 border border-slate-200 rounded-lg p-4">
               <h4 className="text-[14px] font-bold text-slate-900 mb-0.5">ブラウザストレージ</h4>
               <p className="text-[10px] font-mono text-slate-400 mb-3">inventory-store.ts</p>
 
               <div className="space-y-4">
                 <div>
                   <p className="text-[11px] font-semibold text-slate-600 mb-1">保存キー</p>
-                  <code className="text-[12px] font-mono bg-white px-2 py-1 rounded border border-violet-200 text-violet-700 block text-center">&quot;clever-inventory-data&quot;</code>
+                  <code className="text-[12px] font-mono bg-white px-2 py-1 rounded border border-slate-200 text-slate-700 block text-center">&quot;clever-inventory-data&quot;</code>
                 </div>
                 <div>
                   <p className="text-[11px] font-semibold text-slate-600 mb-1">JSON 構造</p>
-                  <pre className="text-[10px] font-mono bg-white p-2.5 rounded border border-violet-100 text-slate-600 leading-relaxed">{`{
+                  <pre className="text-[10px] font-mono bg-white p-2.5 rounded border border-slate-100 text-slate-600 leading-relaxed">{`{
   products: UnifiedProduct[],
   metadata: {
     lastUpdated,
@@ -284,12 +284,12 @@ export default function DataFlowPage() {
                 <div>
                   <p className="text-[11px] font-semibold text-slate-600 mb-1">操作</p>
                   <div className="space-y-0.5 text-[11px] text-slate-600">
-                    <p><code className="font-mono text-violet-600">loadInventory()</code> 読込</p>
-                    <p><code className="font-mono text-violet-600">saveInventory()</code> 上書き保存</p>
-                    <p><code className="font-mono text-violet-600">clearInventory()</code> 全削除</p>
+                    <p><code className="font-mono text-slate-600">loadInventory()</code> 読込</p>
+                    <p><code className="font-mono text-slate-600">saveInventory()</code> 上書き保存</p>
+                    <p><code className="font-mono text-slate-600">clearInventory()</code> 全削除</p>
                   </div>
                 </div>
-                <div className="p-2 bg-amber-50 border border-amber-200 rounded-lg text-[10px] text-amber-700">
+                <div className="p-2 bg-slate-50 border border-slate-300 rounded-lg text-[10px] text-slate-700">
                   容量上限 ≈ 5MB（QuotaExceededError 時はエラー表示）
                 </div>
               </div>
@@ -359,7 +359,7 @@ export default function DataFlowPage() {
                 <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <p className="text-[11px] font-bold text-slate-500">現在の実装</p>
-                    <span className="px-1.5 py-0.5 bg-rose-50 text-rose-600 text-[9px] font-bold rounded border border-rose-200">要改修</span>
+                    <span className="px-1.5 py-0.5 bg-slate-800 text-white text-[9px] font-bold rounded border border-slate-800">要改修</span>
                   </div>
                   <div className="p-2 bg-white rounded border border-slate-200 text-center">
                     <p className="text-[13px] font-mono font-bold text-slate-700">販売単価 = 仕入値 × 1.5</p>
@@ -367,17 +367,17 @@ export default function DataFlowPage() {
                   </div>
                   <p className="text-[10px] text-slate-400 mt-2">fixedCost(6000), processingCostPerCut(500) は定義済みだが計算に未使用</p>
                 </div>
-                <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-lg">
+                <div className="p-3 bg-slate-50 border border-slate-300 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <p className="text-[11px] font-bold text-amber-700">改修後（6/9 MTG 合意）</p>
-                    <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-bold rounded border border-amber-300">実装待ち</span>
+                    <p className="text-[11px] font-bold text-slate-700">改修後（6/9 MTG 合意）</p>
+                    <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[9px] font-bold rounded border border-slate-300">実装待ち</span>
                   </div>
-                  <div className="p-2 bg-white rounded border border-amber-200 text-center">
+                  <div className="p-2 bg-white rounded border border-slate-200 text-center">
                     <p className="text-[14px] font-mono font-bold text-slate-900">販売価格 = (仕入単価 × カット長 + 固定費) / (1 − 粗利率)</p>
                   </div>
                   <div className="mt-2 space-y-0.5 text-[10px] text-slate-600">
                     <p><strong>仕入単価</strong>: CSV の purchasePrice [要確認B: どのカラムか]</p>
-                    <p><strong>カット長</strong>: <span className="text-rose-600 font-semibold">未定 [要確認D]</span></p>
+                    <p><strong>カット長</strong>: <span className="text-slate-800 font-semibold">未定 [要確認D]</span></p>
                     <p><strong>固定費</strong>: ¥6,000（デフォルト / 商品ごとに編集可）</p>
                     <p><strong>粗利率</strong>: ≈50%（デフォルト / 全商品共通）</p>
                   </div>
@@ -415,7 +415,7 @@ export default function DataFlowPage() {
                     <p>差分（目開き・幅・価格）を%表示</p>
                     <p>日本語の提案理由を自動生成</p>
                   </div>
-                  <div className="mt-3 p-2 border border-dashed border-rose-300 rounded-lg bg-rose-50/50 text-[10px] text-rose-600">
+                  <div className="mt-3 p-2 border border-dashed border-slate-400 rounded-lg bg-slate-50/50 text-[10px] text-slate-700">
                     <strong>注意:</strong> netoron/trikaru は meshSize なし → 40%が常に0 → 候補不足の可能性 [要確認E]
                   </div>
                 </div>
@@ -437,7 +437,7 @@ export default function DataFlowPage() {
         {/* ================================================== */}
         <Stage num="5" title="アウトプット" desc="営業担当者が操作する検索結果画面" color="indigo">
           <div className="grid grid-cols-5 gap-4">
-            <div className="col-span-3 bg-indigo-50/50 border border-indigo-200 rounded-xl p-4">
+            <div className="col-span-3 bg-slate-50/50 border border-slate-200 rounded-lg p-4">
               <h4 className="text-[14px] font-bold text-slate-900 mb-0.5">検索結果テーブル</h4>
               <p className="text-[10px] text-slate-500 mb-3">/search ページ — フィルタ結果を一覧表示</p>
 
@@ -464,24 +464,24 @@ export default function DataFlowPage() {
               <p className="text-[10px] text-slate-400 mt-3">在庫0の行に「類似品を表示」ボタン → ダイアログで最大5件</p>
             </div>
 
-            <div className="col-span-2 bg-indigo-50/50 border border-indigo-200 rounded-xl p-4">
+            <div className="col-span-2 bg-slate-50/50 border border-slate-200 rounded-lg p-4">
               <h4 className="text-[14px] font-bold text-slate-900 mb-0.5">代替品ダイアログ</h4>
               <p className="text-[10px] text-slate-500 mb-3">在庫切れ商品の類似品を提示</p>
               <div className="space-y-2 text-[11px] text-slate-600">
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[9px] font-bold flex items-center justify-center flex-shrink-0">1</span>
+                  <span className="w-5 h-5 rounded bg-slate-100 text-slate-600 text-[9px] font-bold flex items-center justify-center flex-shrink-0">1</span>
                   <span>候補商品の基本情報（品番・幅・在庫）</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[9px] font-bold flex items-center justify-center flex-shrink-0">2</span>
+                  <span className="w-5 h-5 rounded bg-slate-100 text-slate-600 text-[9px] font-bold flex items-center justify-center flex-shrink-0">2</span>
                   <span>類似度スコア（0.0〜1.0）</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[9px] font-bold flex items-center justify-center flex-shrink-0">3</span>
+                  <span className="w-5 h-5 rounded bg-slate-100 text-slate-600 text-[9px] font-bold flex items-center justify-center flex-shrink-0">3</span>
                   <span>差分（目開き・幅・価格の差を%表示）</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[9px] font-bold flex items-center justify-center flex-shrink-0">4</span>
+                  <span className="w-5 h-5 rounded bg-slate-100 text-slate-600 text-[9px] font-bold flex items-center justify-center flex-shrink-0">4</span>
                   <span>日本語の提案理由テキスト</span>
                 </div>
               </div>
@@ -529,15 +529,13 @@ export default function DataFlowPage() {
 /* ================================================================ */
 
 /* ---- Stage wrapper ---- */
-function Stage({ num, title, desc, color, children }: {
-  num: string; title: string; desc: string; color: string; children: ReactNode
+function Stage({ num, title, desc, children }: {
+  num: string; title: string; desc: string; color?: string; children: ReactNode
 }) {
-  const bg: Record<string, string> = { blue: 'border-blue-400', emerald: 'border-emerald-400', violet: 'border-violet-400', amber: 'border-amber-400', indigo: 'border-indigo-400', rose: 'border-rose-400' }
-  const dot: Record<string, string> = { blue: 'bg-blue-500', emerald: 'bg-emerald-500', violet: 'bg-violet-500', amber: 'bg-amber-500', indigo: 'bg-indigo-500', rose: 'bg-rose-500' }
   return (
-    <div className={`border-l-4 ${bg[color]} rounded-2xl bg-white/70 backdrop-blur p-5 mt-4 shadow-sm`}>
+    <div className="rounded-lg bg-white/70 backdrop-blur p-5 mt-4 shadow-sm border border-slate-200">
       <div className="flex items-center gap-3 mb-4">
-        <div className={`w-8 h-8 rounded-lg ${dot[color]} flex items-center justify-center text-white text-[14px] font-bold flex-shrink-0`}>{num}</div>
+        <div className="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-white text-[14px] font-bold flex-shrink-0">{num}</div>
         <div>
           <h2 className="text-[16px] font-bold text-slate-900">{title}</h2>
           <p className="text-[11px] text-slate-500">{desc}</p>
@@ -553,7 +551,7 @@ function FlowArrow({ label, detail }: { label: string; detail: string }) {
   return (
     <div className="flex flex-col items-center py-3">
       <div className="w-0.5 h-4 bg-slate-300" />
-      <div className="px-6 py-2.5 bg-white border border-slate-200 rounded-xl shadow-sm max-w-lg">
+      <div className="px-6 py-2.5 bg-white border border-slate-200 rounded-lg shadow-sm max-w-lg">
         <p className="text-[13px] text-slate-700 font-semibold text-center">{label}</p>
         <p className="text-[10px] text-slate-400 text-center mt-0.5">{detail}</p>
       </div>
@@ -564,15 +562,14 @@ function FlowArrow({ label, detail }: { label: string; detail: string }) {
 }
 
 /* ---- Data Source Card ---- */
-function SourceCard({ title, tag, tagColor, fields, keyNote, warns }: {
-  title: string; tag: string; tagColor: string; fields: string[]; keyNote: string; warns?: string[]
+function SourceCard({ title, tag, fields, keyNote, warns }: {
+  title: string; tag: string; tagColor?: string; fields: string[]; keyNote: string; warns?: string[]
 }) {
-  const tagBg: Record<string, string> = { blue: 'bg-blue-100 text-blue-700', emerald: 'bg-emerald-100 text-emerald-700', violet: 'bg-violet-100 text-violet-700', amber: 'bg-amber-100 text-amber-700' }
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-3.5">
+    <div className="bg-white border border-slate-200 rounded-lg p-3.5">
       <div className="flex items-center gap-2 mb-2">
         <h4 className="text-[13px] font-bold text-slate-900">{title}</h4>
-        <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${tagBg[tagColor]}`}>{tag}</span>
+        <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-slate-100 text-slate-600">{tag}</span>
       </div>
       <div className="flex flex-wrap gap-1 mb-2">
         {fields.map(f => (
@@ -583,7 +580,7 @@ function SourceCard({ title, tag, tagColor, fields, keyNote, warns }: {
       {warns && warns.length > 0 && (
         <div className="mt-2 space-y-0.5">
           {warns.map((w, i) => (
-            <p key={i} className="text-[9px] text-rose-500">⚠ {w}</p>
+            <p key={i} className="text-[9px] text-slate-500">⚠ {w}</p>
           ))}
         </div>
       )}
@@ -592,14 +589,13 @@ function SourceCard({ title, tag, tagColor, fields, keyNote, warns }: {
 }
 
 /* ---- Pipeline Step ---- */
-function PipeStep({ num, title, color, children, isFirst, isLast }: {
-  num: string; title: string; color: string; children: ReactNode; isFirst?: boolean; isLast?: boolean
+function PipeStep({ num, title, children, isFirst, isLast }: {
+  num: string; title: string; color?: string; children: ReactNode; isFirst?: boolean; isLast?: boolean
 }) {
-  const dotBg: Record<string, string> = { emerald: 'bg-emerald-500' }
   return (
-    <div className={`flex-1 bg-white border border-slate-200 ${isFirst ? 'rounded-l-xl' : ''} ${isLast ? 'rounded-r-xl' : ''} p-3`}>
+    <div className={`flex-1 bg-white border border-slate-200 ${isFirst ? 'rounded-l-lg' : ''} ${isLast ? 'rounded-r-lg' : ''} p-3`}>
       <div className="flex items-center gap-1.5 mb-2">
-        <span className={`w-5 h-5 rounded ${dotBg[color] || 'bg-emerald-500'} text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0`}>{num}</span>
+        <span className="w-5 h-5 rounded bg-slate-700 text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">{num}</span>
         <span className="text-[12px] font-bold text-slate-800">{title}</span>
       </div>
       {children}
@@ -611,7 +607,7 @@ function PipeStep({ num, title, color, children, isFirst, isLast }: {
 function PipeChevron() {
   return (
     <div className="flex items-center flex-shrink-0 -mx-px z-10">
-      <div className="w-0 h-0 border-t-[16px] border-b-[16px] border-l-[12px] border-t-transparent border-b-transparent border-l-emerald-300" />
+      <div className="w-0 h-0 border-t-[16px] border-b-[16px] border-l-[12px] border-t-transparent border-b-transparent border-l-slate-300" />
     </div>
   )
 }
@@ -621,13 +617,13 @@ function EngineCard({ title, badge, desc, warn, children }: {
   title: string; badge: string; desc: string; warn?: boolean; children: ReactNode
 }) {
   return (
-    <div className={`bg-white border ${warn ? 'border-amber-300 ring-1 ring-rose-100' : 'border-slate-200'} rounded-xl p-4`}>
+    <div className={`bg-white border ${warn ? 'border-slate-300 ring-1 ring-slate-100' : 'border-slate-200'} rounded-lg p-4`}>
       <div className="flex items-start justify-between mb-1">
         <div>
           <h4 className="text-[14px] font-bold text-slate-900">{title}</h4>
           <p className="text-[10px] font-mono text-slate-400">{badge}</p>
         </div>
-        {warn && <span className="px-1.5 py-0.5 bg-rose-50 text-rose-500 text-[9px] font-bold rounded border border-rose-200 flex-shrink-0">要改修</span>}
+        {warn && <span className="px-1.5 py-0.5 bg-slate-800 text-white text-[9px] font-bold rounded border border-slate-800 flex-shrink-0">要改修</span>}
       </div>
       <p className="text-[11px] text-slate-500 mb-3">{desc}</p>
       {children}
@@ -637,13 +633,13 @@ function EngineCard({ title, badge, desc, warn, children }: {
 
 /* ---- Small helpers ---- */
 function MiniTag({ children }: { children: ReactNode }) {
-  return <span className="text-[9px] font-mono bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200">{children}</span>
+  return <span className="text-[9px] font-mono bg-slate-50 text-slate-700 px-1.5 py-0.5 rounded border border-slate-200">{children}</span>
 }
 
 function ReqField({ children }: { children: ReactNode }) {
   return (
     <div className="flex items-center gap-1.5 text-[10px]">
-      <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
+      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 flex-shrink-0" />
       <span className="text-slate-600">{children}</span>
     </div>
   )
@@ -652,7 +648,7 @@ function ReqField({ children }: { children: ReactNode }) {
 function FieldGroup({ title, children, warn }: { title: string; children: ReactNode; warn?: boolean }) {
   return (
     <div>
-      <p className={`text-[10px] font-bold mb-1 ${warn ? 'text-rose-500' : 'text-slate-500'}`}>{title}</p>
+      <p className={`text-[10px] font-bold mb-1 ${warn ? 'text-slate-700' : 'text-slate-500'}`}>{title}</p>
       <div className="space-y-0.5">{children}</div>
     </div>
   )
@@ -660,7 +656,7 @@ function FieldGroup({ title, children, warn }: { title: string; children: ReactN
 
 function Field({ name, note, warn }: { name: string; note: string; warn?: boolean }) {
   return (
-    <div className={`flex items-baseline gap-1.5 text-[10px] ${warn ? 'text-rose-500' : 'text-slate-600'}`}>
+    <div className={`flex items-baseline gap-1.5 text-[10px] ${warn ? 'text-slate-700' : 'text-slate-600'}`}>
       <span className="font-mono font-semibold flex-shrink-0">{name}</span>
       <span className="text-slate-400">— {note}</span>
     </div>
@@ -680,7 +676,7 @@ function FilterRow({ name, method, note }: { name: string; method: string; note?
 function ProcStep({ step, text }: { step: string; text: string }) {
   return (
     <div className="flex items-center gap-2 text-[11px]">
-      <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-[9px] font-bold flex items-center justify-center flex-shrink-0">{step}</span>
+      <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 text-[9px] font-bold flex items-center justify-center flex-shrink-0">{step}</span>
       <span className="text-slate-600">{text}</span>
     </div>
   )
@@ -691,27 +687,27 @@ function ScoreRow({ label, pct, note, warn }: { label: string; pct: number; note
     <div className="flex items-center gap-2 text-[10px]">
       <span className="w-7 text-right font-bold font-mono text-slate-600 flex-shrink-0">{pct}%</span>
       <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden flex-shrink-0">
-        <div className={`h-full rounded-full ${warn ? 'bg-rose-300' : 'bg-amber-400'}`} style={{ width: `${pct}%` }} />
+        <div className={`h-full rounded-full ${warn ? 'bg-slate-500' : 'bg-slate-400'}`} style={{ width: `${pct}%` }} />
       </div>
-      <span className={`${warn ? 'text-rose-600 font-semibold' : 'text-slate-600'}`}>{label}</span>
+      <span className={`${warn ? 'text-slate-800 font-semibold' : 'text-slate-600'}`}>{label}</span>
       {note && <span className="text-slate-400">({note})</span>}
     </div>
   )
 }
 
 function WarnDot() {
-  return <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-400 ml-1" title="要改修" />
+  return <span className="inline-block w-1.5 h-1.5 rounded-full bg-slate-600 ml-1" title="要改修" />
 }
 
 /* ---- Open Item ---- */
 function OpenItem({ id, title, desc, who, status }: { id: string; title: string; desc: string; who: string; status: string }) {
-  const statusColor = status === '未確認' ? 'bg-rose-50 text-rose-600 border-rose-200'
-    : status === '確認中' ? 'bg-amber-50 text-amber-600 border-amber-200'
-    : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+  const statusColor = status === '未確認' ? 'bg-slate-800 text-white border-slate-800'
+    : status === '確認中' ? 'bg-slate-100 text-slate-600 border-slate-300'
+    : 'bg-white text-slate-500 border-slate-300'
   return (
-    <div className="p-3 bg-white border border-slate-200 rounded-xl">
+    <div className="p-3 bg-white border border-slate-200 rounded-lg">
       <div className="flex items-center gap-2 mb-1">
-        <span className="w-6 h-6 rounded bg-rose-100 text-rose-600 text-[11px] font-bold flex items-center justify-center flex-shrink-0">{id}</span>
+        <span className="w-6 h-6 rounded bg-slate-100 text-slate-600 text-[11px] font-bold flex items-center justify-center flex-shrink-0">{id}</span>
         <h4 className="text-[12px] font-bold text-slate-800">{title}</h4>
       </div>
       <p className="text-[10px] text-slate-500 leading-relaxed">{desc}</p>
