@@ -42,6 +42,14 @@ mtg-*.md
 zaiko-*.csv
 !__tests__/fixtures/zaiko-*.csv
 
+# Resource data files (raw CSVs, SQLite DB, generated assets)
+resource/*.csv
+resource/*.db
+*.png
+
+# Upload scripts (separate tooling)
+upload-price-to-ecpf/
+
 # Test
 coverage/
 playwright-report/
