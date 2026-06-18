@@ -9,7 +9,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
 
   const navItems = [
-    { href: '/', label: 'CSV取込' },
+    { href: '/', label: 'ホーム' },
     { href: '/search', label: '商品検索' },
     { href: '/dataflow', label: 'データフロー' },
     { href: '/dataflow/confirm', label: '要件確認' },

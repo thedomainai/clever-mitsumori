@@ -1,6 +1,7 @@
 'use client'
 
-import { SearchResult, UnifiedProduct } from '@/lib/types'
+import type { SearchResult, ProductOverride } from '@/lib/types'
+import type { OverrideMap } from '@/hooks/use-product-overrides'
 import { Table, TableHeader } from '@/components/ui/table'
 import ResultsRow from './results-row'
 import Pagination from './pagination'
@@ -15,34 +16,36 @@ export interface ResultsTableProps {
   onSort: (column: string) => void
   sortColumn: string | null
   sortDirection: 'asc' | 'desc' | null
-  onShowAlternatives: (product: UnifiedProduct) => void
+  overrides: OverrideMap
+  onSaveOverride: (ecHinban: string, fields: Partial<Omit<ProductOverride, 'updated_at'>>) => void
 }
 
 export default function ResultsTable({
   results,
   totalResults,
   page,
-  pageSize,
   totalPages,
   onPageChange,
   onSort,
   sortColumn,
   sortDirection,
-  onShowAlternatives,
+  overrides,
+  onSaveOverride,
 }: ResultsTableProps) {
   const headers = [
-    { key: 'productCode', label: '品番' },
-    { key: 'commonKey', label: '共通キー' },
-    { key: 'productType', label: 'カテゴリ' },
-    { key: 'material', label: '材質/カラー' },
-    { key: 'meshSize', label: '目開き(μ)' },
-    { key: 'width', label: '幅(mm)' },
-    { key: 'meshCount', label: 'メッシュ/線径' },
-    { key: 'stockQuantity', label: '在庫(m)' },
-    { key: 'purchasePrice', label: '仕入値(/m)' },
-    { key: 'unitPrice', label: 'EC参考単価' },
-    { key: 'inventoryStatus', label: 'ステータス' },
-    { key: 'actions', label: '' },
+    { key: 'ec_hinban', label: 'EC品番' },
+    { key: 'hinban', label: '品番' },
+    { key: 'zaishitsu', label: '材質' },
+    { key: 'meopen_um', label: '目開き(μ)' },
+    { key: 'size', label: 'サイズ' },
+    { key: 'color', label: 'カラー' },
+    { key: 'shiire_per_m', label: '仕入値(/m)' },
+    { key: 'kotei_hi', label: '固定費' },
+    { key: 'arari_rate', label: '粗利率' },
+    { key: 'hanbai_kakaku', label: '算出販売価格' },
+    { key: 'rakuten_price', label: '楽天価格' },
+    { key: 'yahoo_price', label: 'Yahoo価格' },
+    { key: 'amazon_price', label: 'Amazon価格' },
   ]
 
   if (results.length === 0) {
@@ -60,11 +63,21 @@ export default function ResultsTable({
     )
   }
 
+  const overrideCount = results.filter((r) => overrides.has(r.product.ec_hinban)).length
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-600">
-          検索結果: <span className="font-semibold text-slate-900">{totalResults}件</span>
+          検索結果: <span className="font-semibold text-slate-900">{totalResults.toLocaleString()}件</span>
+          {overrideCount > 0 && (
+            <span className="ml-2 text-blue-600">
+              （<span className="inline-flex items-center gap-1">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500" />
+                {overrideCount}件 編集済み
+              </span>）
+            </span>
+          )}
         </p>
       </div>
 
@@ -73,9 +86,9 @@ export default function ResultsTable({
           headers={headers.map((header) => (
             <TableHeader
               key={header.key}
-              sortable={header.key !== 'actions'}
+              sortable
               sorted={sortColumn === header.key ? sortDirection : null}
-              onSort={() => header.key !== 'actions' && onSort(header.key)}
+              onSort={() => onSort(header.key)}
             >
               {header.label}
             </TableHeader>
@@ -83,9 +96,10 @@ export default function ResultsTable({
         >
           {results.map((result, index) => (
             <ResultsRow
-              key={result.product.id || index}
+              key={result.product.ec_hinban + index}
               result={result}
-              onShowAlternatives={onShowAlternatives}
+              override={overrides.get(result.product.ec_hinban)}
+              onSaveOverride={onSaveOverride}
             />
           ))}
         </Table>

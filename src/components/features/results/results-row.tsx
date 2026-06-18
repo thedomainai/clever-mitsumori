@@ -1,72 +1,73 @@
 'use client'
 
-import { SearchResult, UnifiedProduct } from '@/lib/types'
+import type { SearchResult, ProductOverride } from '@/lib/types'
+import { PRICE_CONFIG } from '@/lib/constants'
 import { TableRow, TableCell } from '@/components/ui/table'
-import InventoryStatusBadge from './inventory-status-badge'
-import PriceDisplay from './price-display'
-import Button from '@/components/ui/button'
+import EditableCell from '@/components/ui/editable-cell'
 
 export interface ResultsRowProps {
   result: SearchResult
-  onShowAlternatives: (product: UnifiedProduct) => void
+  override?: ProductOverride
+  onSaveOverride: (ecHinban: string, fields: Partial<Omit<ProductOverride, 'updated_at'>>) => void
 }
 
-export default function ResultsRow({ result, onShowAlternatives }: ResultsRowProps) {
-  const { product, calculatedPrice, inventoryStatusLabel, inventoryStatusColor, hasAlternatives } = result
+function formatPrice(price: number | undefined | null): string {
+  if (price == null) return '-'
+  return new Intl.NumberFormat('ja-JP', {
+    style: 'currency',
+    currency: 'JPY',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price)
+}
 
-  const isExcess = product.inventoryStatus === 'EXCESS'
-  const isOutOfStock = product.inventoryStatus === 'DELIVERY_INQUIRY'
+function formatPercent(rate: number | undefined | null): string {
+  if (rate == null) return '-'
+  return `${(rate * 100).toFixed(0)}%`
+}
 
-  const rowClassName = isExcess ? 'bg-red-50/50' : ''
-
-  const getCategoryLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      mesh: 'メッシュ',
-      netoron: 'ネトロン',
-      trikaru: 'トリカル',
-    }
-    return labels[type] || type
-  }
-
-  const getMaterialOrColor = () => {
-    if (product.productType === 'mesh') {
-      return product.material || '-'
-    }
-    return product.color || '-'
-  }
+export default function ResultsRow({ result, override, onSaveOverride }: ResultsRowProps) {
+  const { product, calculatedPrice } = result
+  const ecHinban = product.ec_hinban
 
   return (
-    <TableRow className={rowClassName}>
-      <TableCell className="font-medium text-slate-900">{product.productCode}</TableCell>
-      <TableCell>{product.commonKey || '-'}</TableCell>
-      <TableCell>
-        <span className="text-xs font-medium text-slate-500">{getCategoryLabel(product.productType)}</span>
+    <TableRow>
+      <TableCell className="font-medium text-slate-900 text-xs max-w-[180px] truncate">
+        {product.ec_hinban}
       </TableCell>
-      <TableCell>{getMaterialOrColor()}</TableCell>
-      <TableCell>{product.meshSize ? `${product.meshSize}μ` : '-'}</TableCell>
-      <TableCell>{product.width}mm</TableCell>
-      <TableCell>{product.meshCount || '-'}</TableCell>
-      <TableCell className="text-right tabular-nums">{product.stockQuantity.toFixed(1)}</TableCell>
+      <TableCell className="text-xs">{product.hinban ?? '-'}</TableCell>
+      <TableCell>{product.zaishitsu ?? '-'}</TableCell>
       <TableCell className="text-right tabular-nums">
-        <PriceDisplay price={product.purchasePrice} />
+        {product.meopen_um != null ? `${product.meopen_um}` : '-'}
       </TableCell>
+      <TableCell className="text-xs max-w-[120px] truncate">{product.size ?? '-'}</TableCell>
+      <TableCell>{product.color ?? '-'}</TableCell>
+      <EditableCell
+        value={product.shiire_per_m}
+        format={formatPrice}
+        isOverridden={override?.shiire_per_m != null}
+        onSave={(v) => onSaveOverride(ecHinban, { shiire_per_m: v })}
+      />
+      <EditableCell
+        value={product.kotei_hi ?? PRICE_CONFIG.defaultFixedCost}
+        format={formatPrice}
+        isOverridden={override?.kotei_hi != null}
+        onSave={(v) => onSaveOverride(ecHinban, { kotei_hi: v })}
+      />
+      <EditableCell
+        value={product.arari_rate ?? PRICE_CONFIG.defaultGrossMarginRate}
+        format={formatPercent}
+        isOverridden={override?.arari_rate != null}
+        onSave={(v) => onSaveOverride(ecHinban, { arari_rate: v })}
+        inputSuffix="%"
+        editScale={100}
+      />
       <TableCell className="text-right tabular-nums font-medium">
-        <PriceDisplay price={calculatedPrice.unitPrice} />
+        {formatPrice(calculatedPrice)}
       </TableCell>
-      <TableCell>
-        <InventoryStatusBadge status={inventoryStatusLabel} color={inventoryStatusColor} />
-      </TableCell>
-      <TableCell>
-        {isOutOfStock && hasAlternatives && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => onShowAlternatives(product)}
-          >
-            代替品
-          </Button>
-        )}
-      </TableCell>
+      <TableCell className="text-right tabular-nums">{formatPrice(product.rakuten_price)}</TableCell>
+      <TableCell className="text-right tabular-nums">{formatPrice(product.yahoo_price)}</TableCell>
+      <TableCell className="text-right tabular-nums">{formatPrice(product.amazon_price)}</TableCell>
     </TableRow>
   )
 }

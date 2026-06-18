@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef } from 'react'
-import { UnifiedProduct, SearchFilter, SearchResult, Pagination, Sort } from '@/lib/types'
-import { searchProducts } from '@/lib/services/search-engine'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
+import type { UnifiedProduct, SearchFilter, SearchResult, Pagination, Sort } from '@/lib/types'
+import type { OverrideMap } from './use-product-overrides'
+import { searchProducts, mergeOverrides } from '@/lib/services/search-engine'
 
-export function useSearch(products: UnifiedProduct[]) {
+export function useSearch(products: UnifiedProduct[], overrides: OverrideMap) {
   const [results, setResults] = useState<SearchResult[]>([])
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
@@ -17,42 +18,55 @@ export function useSearch(products: UnifiedProduct[]) {
   const [currentFilters, setCurrentFilters] = useState<SearchFilter>({})
   const hasInitialSearchRun = useRef(false)
 
+  // Merge base data with Firestore overrides
+  const { merged, overriddenKeys } = useMemo(
+    () => mergeOverrides(products, overrides),
+    [products, overrides],
+  )
+
   const executeSearch = useCallback(
     (filters: SearchFilter, page: number = 1, sort?: Sort) => {
-      const result = searchProducts(
-        products,
-        filters,
-        sort,
-        page,
-        100
-      )
+      const result = searchProducts(merged, filters, sort, page, 100)
 
       if (result.success) {
-        setResults(result.data.results)
+        // Tag each result with overridden flag
+        const tagged = result.data.results.map((r) => ({
+          ...r,
+          overridden: overriddenKeys.has(r.product.ec_hinban),
+        }))
+        setResults(tagged)
         setPagination(result.data.pagination)
         setCurrentFilters(filters)
         return true
       } else {
         setResults([])
-        setPagination({
-          page: 1,
-          pageSize: 100,
-          totalResults: 0,
-          totalPages: 0,
-        })
+        setPagination({ page: 1, pageSize: 100, totalResults: 0, totalPages: 0 })
         return false
       }
     },
-    [products]
+    [merged, overriddenKeys],
   )
 
-  // 商品データが利用可能になったら初回検索を自動実行
+  // Re-run search when merged data or overrides change
   useEffect(() => {
-    if (products.length > 0 && !hasInitialSearchRun.current) {
+    if (merged.length > 0) {
+      const sort: Sort | undefined =
+        sortColumn && sortDirection
+          ? { field: sortColumn as Sort['field'], order: sortDirection }
+          : undefined
+      executeSearch(currentFilters, pagination.page, sort)
+      hasInitialSearchRun.current = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [merged, overriddenKeys])
+
+  // Initial search
+  useEffect(() => {
+    if (merged.length > 0 && !hasInitialSearchRun.current) {
       hasInitialSearchRun.current = true
       executeSearch({})
     }
-  }, [products, executeSearch])
+  }, [merged, executeSearch])
 
   const handleSort = useCallback(
     (column: string) => {
@@ -71,20 +85,23 @@ export function useSearch(products: UnifiedProduct[]) {
 
       setSortColumn(column)
       setSortDirection(newDirection)
-      const sortField = column as Sort['field']
-      executeSearch(currentFilters, pagination.page, { field: sortField, order: newDirection })
+      executeSearch(currentFilters, pagination.page, {
+        field: column as Sort['field'],
+        order: newDirection,
+      })
     },
-    [sortColumn, sortDirection, currentFilters, pagination.page, executeSearch]
+    [sortColumn, sortDirection, currentFilters, pagination.page, executeSearch],
   )
 
   const handlePageChange = useCallback(
     (page: number) => {
-      const sort: Sort | undefined = sortColumn && sortDirection
-        ? { field: sortColumn as Sort['field'], order: sortDirection }
-        : undefined
+      const sort: Sort | undefined =
+        sortColumn && sortDirection
+          ? { field: sortColumn as Sort['field'], order: sortDirection }
+          : undefined
       executeSearch(currentFilters, page, sort)
     },
-    [currentFilters, sortColumn, sortDirection, executeSearch]
+    [currentFilters, sortColumn, sortDirection, executeSearch],
   )
 
   return {
