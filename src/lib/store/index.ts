@@ -1,1 +1,1 @@
-export { loadInventory, saveInventory, clearInventory, getStorageInfo } from './inventory-store'
+// localStorage store is no longer used (data is loaded from /data/unified.json)

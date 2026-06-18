@@ -1,5 +1,33 @@
-import type { Result, UnifiedProduct, SearchFilter, Sort, SearchResult, Pagination } from '../types'
+import type { Result, UnifiedProduct, ProductOverride, SearchFilter, Sort, SearchResult, Pagination } from '../types'
 import { calculateEcPrice } from './price-calculator'
+
+type OverrideMap = Map<string, ProductOverride>
+
+/**
+ * ベースデータ (unified.json) にオーバーライド (Firestore) を合成する。
+ * CSV 再アップロードでベースが更新されても、オーバーライドは独立して生き残る。
+ */
+export function mergeOverrides(
+  products: UnifiedProduct[],
+  overrides: OverrideMap,
+): { merged: UnifiedProduct[]; overriddenKeys: Set<string> } {
+  const overriddenKeys = new Set<string>()
+
+  const merged = products.map((p) => {
+    const ov = overrides.get(p.ec_hinban)
+    if (!ov) return p
+
+    overriddenKeys.add(p.ec_hinban)
+    return {
+      ...p,
+      ...(ov.shiire_per_m != null ? { shiire_per_m: ov.shiire_per_m } : {}),
+      ...(ov.kotei_hi != null ? { kotei_hi: ov.kotei_hi } : {}),
+      ...(ov.arari_rate != null ? { arari_rate: ov.arari_rate } : {}),
+    }
+  })
+
+  return { merged, overriddenKeys }
+}
 
 function normalizeString(str: string): string {
   return str
@@ -9,97 +37,52 @@ function normalizeString(str: string): string {
 }
 
 function matchesFilter(product: UnifiedProduct, filters: SearchFilter): boolean {
-  if (filters.productType && product.productType !== filters.productType) {
-    return false
+  if (filters.zaishitsu) {
+    if (!product.zaishitsu) return false
+    const normalized = normalizeString(filters.zaishitsu)
+    const zaishitsu = normalizeString(product.zaishitsu)
+    if (!zaishitsu.includes(normalized)) return false
   }
 
-  if (filters.productCode) {
-    const normalized = normalizeString(filters.productCode)
-    const productCode = normalizeString(product.productCode)
-    if (!productCode.includes(normalized)) {
-      return false
-    }
+  if (filters.meopen_um_min != null) {
+    if (product.meopen_um == null || product.meopen_um < filters.meopen_um_min) return false
   }
 
-  if (filters.commonKey) {
-    if (!product.commonKey) return false
-    const normalized = normalizeString(filters.commonKey)
-    const commonKey = normalizeString(product.commonKey)
-    if (!commonKey.includes(normalized)) {
-      return false
-    }
+  if (filters.meopen_um_max != null) {
+    if (product.meopen_um == null || product.meopen_um > filters.meopen_um_max) return false
   }
 
-  if (filters.material) {
-    if (!product.material) return false
-    const normalized = normalizeString(filters.material)
-    const material = normalizeString(product.material)
-    if (!material.includes(normalized)) {
-      return false
-    }
+  if (filters.hinban) {
+    if (!product.hinban) return false
+    const normalized = normalizeString(filters.hinban)
+    const hinban = normalizeString(product.hinban)
+    if (!hinban.includes(normalized)) return false
   }
 
-  if (filters.meshSize) {
-    if (!product.meshSize) return false
-    if (filters.meshSize.min && product.meshSize < filters.meshSize.min) {
-      return false
-    }
-    if (filters.meshSize.max && product.meshSize > filters.meshSize.max) {
-      return false
-    }
-  }
-
-  if (filters.meshCount) {
-    if (!product.meshCount) return false
-    const normalized = normalizeString(filters.meshCount)
-    const meshCount = normalizeString(product.meshCount)
-    if (!meshCount.includes(normalized)) {
-      return false
-    }
-  }
-
-  if (filters.width) {
-    if (filters.width.min && product.width < filters.width.min) {
-      return false
-    }
-    if (filters.width.max && product.width > filters.width.max) {
-      return false
-    }
+  if (filters.ec_hinban) {
+    const normalized = normalizeString(filters.ec_hinban)
+    const ecHinban = normalizeString(product.ec_hinban)
+    if (!ecHinban.includes(normalized)) return false
   }
 
   if (filters.color) {
     if (!product.color) return false
     const normalized = normalizeString(filters.color)
     const color = normalizeString(product.color)
-    if (!color.includes(normalized)) {
-      return false
-    }
+    if (!color.includes(normalized)) return false
   }
 
-  if (filters.inventoryStatus && product.inventoryStatus !== filters.inventoryStatus) {
-    return false
-  }
-
-  if (filters.minStock !== undefined && product.stockQuantity < filters.minStock) {
-    return false
-  }
-
-  if (filters.location) {
-    if (!product.location) return false
-    const normalized = normalizeString(filters.location)
-    const location = normalizeString(product.location)
-    if (!location.includes(normalized)) {
-      return false
-    }
-  }
-
-  if (filters.shelfLevel) {
-    if (!product.shelfLevel) return false
-    const normalized = normalizeString(filters.shelfLevel)
-    const shelfLevel = normalizeString(product.shelfLevel)
-    if (!shelfLevel.includes(normalized)) {
-      return false
-    }
+  if (filters.freeText) {
+    const q = normalizeString(filters.freeText)
+    const fields = [
+      product.ec_hinban,
+      product.hinban,
+      product.zaishitsu,
+      product.color,
+      product.size,
+    ]
+    const combined = fields.filter(Boolean).map(f => normalizeString(f!)).join(' ')
+    if (!combined.includes(q)) return false
   }
 
   return true
@@ -109,66 +92,23 @@ function sortProducts(products: UnifiedProduct[], sort?: Sort): UnifiedProduct[]
   if (!sort) return products
 
   return [...products].sort((a, b) => {
-    let aValue: number | string
-    let bValue: number | string
+    const aVal = a[sort.field]
+    const bVal = b[sort.field]
 
-    switch (sort.field) {
-      case 'productCode':
-        aValue = a.productCode
-        bValue = b.productCode
-        break
-      case 'width':
-        aValue = a.width
-        bValue = b.width
-        break
-      case 'stockQuantity':
-        aValue = a.stockQuantity
-        bValue = b.stockQuantity
-        break
-      case 'purchasePrice':
-        aValue = a.purchasePrice
-        bValue = b.purchasePrice
-        break
-      case 'meshSize':
-        aValue = a.meshSize ?? 0
-        bValue = b.meshSize ?? 0
-        break
-      default:
-        return 0
+    if (aVal == null && bVal == null) return 0
+    if (aVal == null) return 1
+    if (bVal == null) return -1
+
+    if (typeof aVal === 'string' && typeof bVal === 'string') {
+      return sort.order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
     }
 
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sort.order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
-    }
-
-    if (typeof aValue === 'number' && typeof bValue === 'number') {
-      return sort.order === 'asc' ? aValue - bValue : bValue - aValue
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      return sort.order === 'asc' ? aVal - bVal : bVal - aVal
     }
 
     return 0
   })
-}
-
-function getInventoryStatusLabel(status: UnifiedProduct['inventoryStatus']): string {
-  switch (status) {
-    case 'IN_STOCK':
-      return '在庫あり'
-    case 'DELIVERY_INQUIRY':
-      return '納期確認'
-    case 'EXCESS':
-      return '余剰在庫'
-  }
-}
-
-function getInventoryStatusColor(status: UnifiedProduct['inventoryStatus']): 'green' | 'red' | 'yellow' {
-  switch (status) {
-    case 'IN_STOCK':
-      return 'green'
-    case 'DELIVERY_INQUIRY':
-      return 'red'
-    case 'EXCESS':
-      return 'yellow'
-  }
 }
 
 export function searchProducts(
@@ -180,41 +120,24 @@ export function searchProducts(
 ): Result<{ results: SearchResult[]; pagination: Pagination }> {
   try {
     const filtered = products.filter((product) => matchesFilter(product, filters))
-
     const sorted = sortProducts(filtered, sort)
 
     const totalResults = sorted.length
     const totalPages = Math.ceil(totalResults / pageSize)
     const startIndex = (page - 1) * pageSize
-    const endIndex = startIndex + pageSize
-    const paginatedProducts = sorted.slice(startIndex, endIndex)
+    const paginatedProducts = sorted.slice(startIndex, startIndex + pageSize)
 
-    const results: SearchResult[] = paginatedProducts.map((product) => {
-      const priceResult = calculateEcPrice(product)
-
-      const calculatedPrice = priceResult.success
-        ? priceResult.data
-        : { unitPrice: 0, unitPriceWithTax: 0 }
-
-      return {
-        product,
-        calculatedPrice,
-        inventoryStatusLabel: getInventoryStatusLabel(product.inventoryStatus),
-        inventoryStatusColor: getInventoryStatusColor(product.inventoryStatus),
-        hasAlternatives: product.stockQuantity === 0,
-      }
-    })
-
-    const pagination: Pagination = {
-      page,
-      pageSize,
-      totalResults,
-      totalPages,
-    }
+    const results: SearchResult[] = paginatedProducts.map((product) => ({
+      product,
+      calculatedPrice: calculateEcPrice(product),
+    }))
 
     return {
       success: true,
-      data: { results, pagination },
+      data: {
+        results,
+        pagination: { page, pageSize, totalResults, totalPages },
+      },
     }
   } catch (error) {
     return {
