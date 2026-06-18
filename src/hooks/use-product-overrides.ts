@@ -9,7 +9,7 @@ import {
   deleteDoc,
   onSnapshot,
 } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+import { db, isFirebaseConfigured } from '@/lib/firebase'
 import type { ProductOverride } from '@/lib/types'
 
 const COLLECTION = 'product_overrides'
@@ -22,8 +22,13 @@ export function useProductOverrides() {
   const [error, setError] = useState<string | null>(null)
   const unsubRef = useRef<(() => void) | null>(null)
 
-  // Real-time listener
+  // Real-time listener (skip if Firebase is not configured)
   useEffect(() => {
+    if (!isFirebaseConfigured || !db) {
+      setIsLoading(false)
+      return
+    }
+
     setIsLoading(true)
     const colRef = collection(db, COLLECTION)
 
@@ -63,6 +68,8 @@ export function useProductOverrides() {
 
   const saveOverride = useCallback(
     async (ecHinban: string, fields: Partial<Omit<ProductOverride, 'updated_at'>>) => {
+      if (!db) return
+
       const existing = overrides.get(ecHinban)
       const merged: ProductOverride = {
         ...existing,
@@ -82,6 +89,7 @@ export function useProductOverrides() {
   )
 
   const removeOverride = useCallback(async (ecHinban: string) => {
+    if (!db) return
     await deleteDoc(doc(db, COLLECTION, ecHinban))
   }, [])
 
