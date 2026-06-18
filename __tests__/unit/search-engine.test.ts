@@ -1,213 +1,199 @@
-import { searchProducts } from '@/lib/services/search-engine'
-import type { UnifiedProduct, SearchFilter, Sort } from '@/lib/types'
+import { searchProducts, mergeOverrides } from '@/lib/services/search-engine'
+import type { UnifiedProduct, ProductOverride, SearchFilter, Sort } from '@/lib/types'
 
-function createMockProduct(overrides: Partial<UnifiedProduct> = {}): UnifiedProduct {
+function createProduct(overrides: Partial<UnifiedProduct> = {}): UnifiedProduct {
   return {
-    id: 'test-id',
-    productType: 'mesh',
-    productCode: 'TEST-001',
-    width: 1000,
-    stockQuantity: 50,
-    inventoryStatus: 'IN_STOCK',
-    arrivalDate: null,
-    lastShipmentDate: null,
-    purchasePrice: 100,
-    createdAt: '2024-01-01T00:00:00.000Z',
-    updatedAt: '2024-01-01T00:00:00.000Z',
+    ec_hinban: 'EC-001',
     ...overrides,
   }
 }
 
 describe('searchProducts', () => {
-  const mockProducts: UnifiedProduct[] = [
-    createMockProduct({ id: '1', productType: 'mesh', productCode: 'MESH-001', width: 1000, purchasePrice: 100, stockQuantity: 50, inventoryStatus: 'IN_STOCK' }),
-    createMockProduct({ id: '2', productType: 'mesh', productCode: 'MESH-002', width: 500, purchasePrice: 200, stockQuantity: 0, inventoryStatus: 'DELIVERY_INQUIRY' }),
-    createMockProduct({ id: '3', productType: 'netoron', productCode: 'NET-001', width: 1500, purchasePrice: 150, stockQuantity: 100, inventoryStatus: 'IN_STOCK' }),
-    createMockProduct({ id: '4', productType: 'mesh', productCode: 'MESH-003', width: 800, purchasePrice: 300, stockQuantity: 30, inventoryStatus: 'IN_STOCK' }),
-    createMockProduct({ id: '5', productType: 'netoron', productCode: 'NET-002', width: 600, purchasePrice: 250, stockQuantity: 200, inventoryStatus: 'EXCESS' }),
+  const products: UnifiedProduct[] = [
+    createProduct({ ec_hinban: 'EC-001', zaishitsu: 'SUS304', hinban: 'M-100', meopen_um: 100, color: 'シルバー', shiire_per_m: 500, cut_m: 1 }),
+    createProduct({ ec_hinban: 'EC-002', zaishitsu: 'SUS316', hinban: 'M-200', meopen_um: 300, color: 'ブラック', shiire_per_m: 800, cut_m: 2 }),
+    createProduct({ ec_hinban: 'EC-003', zaishitsu: 'SUS304', hinban: 'M-300', meopen_um: 600, color: 'シルバー', shiire_per_m: 150, cut_m: 1 }),
+    createProduct({ ec_hinban: 'EC-004', zaishitsu: 'ポリプロ', hinban: 'P-100', color: 'ホワイト', shiire_per_m: 200, cut_m: 1 }),
+    createProduct({ ec_hinban: 'EC-005', zaishitsu: 'SUS304', hinban: 'M-400', meopen_um: 50 }),
   ]
 
   it('should return all products with empty filter', () => {
-    const result = searchProducts(mockProducts, {})
-
+    const result = searchProducts(products, {})
     expect(result.success).toBe(true)
     if (!result.success) return
-
     expect(result.data.results).toHaveLength(5)
     expect(result.data.pagination.totalResults).toBe(5)
   })
 
-  it('should filter by productType', () => {
-    const filter: SearchFilter = { productType: 'mesh' }
-    const result = searchProducts(mockProducts, filter)
-
+  it('should filter by zaishitsu partial match', () => {
+    const filter: SearchFilter = { zaishitsu: 'SUS304' }
+    const result = searchProducts(products, filter)
     expect(result.success).toBe(true)
     if (!result.success) return
-
     expect(result.data.results).toHaveLength(3)
-    expect(result.data.results.every(r => r.product.productType === 'mesh')).toBe(true)
+    expect(result.data.results.every(r => r.product.zaishitsu === 'SUS304')).toBe(true)
   })
 
-  it('should filter by productCode partial match', () => {
-    const filter: SearchFilter = { productCode: 'MESH' }
-    const result = searchProducts(mockProducts, filter)
-
+  it('should filter by meopen_um range', () => {
+    const filter: SearchFilter = { meopen_um_min: 100, meopen_um_max: 400 }
+    const result = searchProducts(products, filter)
     expect(result.success).toBe(true)
     if (!result.success) return
-
-    expect(result.data.results).toHaveLength(3)
-    expect(result.data.results.every(r => r.product.productCode.includes('MESH'))).toBe(true)
-  })
-
-  it('should filter by meshSize range', () => {
-    const productsWithMeshSize = [
-      createMockProduct({ id: '1', productType: 'mesh', meshSize: 100 }),
-      createMockProduct({ id: '2', productType: 'mesh', meshSize: 300 }),
-      createMockProduct({ id: '3', productType: 'mesh', meshSize: 600 }),
-    ]
-
-    const filter: SearchFilter = { meshSize: { min: 100, max: 500 } }
-    const result = searchProducts(productsWithMeshSize, filter)
-
-    expect(result.success).toBe(true)
-    if (!result.success) return
-
     expect(result.data.results).toHaveLength(2)
-    expect(result.data.results.map(r => r.product.meshSize)).toEqual([100, 300])
+    expect(result.data.results.map(r => r.product.meopen_um)).toEqual([100, 300])
   })
 
-  it('should filter by width range', () => {
-    const filter: SearchFilter = { width: { min: 500, max: 1500 } }
-    const result = searchProducts(mockProducts, filter)
-
+  it('should filter by meopen_um min only', () => {
+    const filter: SearchFilter = { meopen_um_min: 300 }
+    const result = searchProducts(products, filter)
     expect(result.success).toBe(true)
     if (!result.success) return
+    expect(result.data.results).toHaveLength(2)
+  })
 
+  it('should exclude products without meopen_um when filtering by range', () => {
+    const filter: SearchFilter = { meopen_um_min: 0 }
+    const result = searchProducts(products, filter)
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    // EC-004 has no meopen_um, so excluded
+    expect(result.data.results).toHaveLength(4)
+  })
+
+  it('should filter by hinban partial match', () => {
+    const filter: SearchFilter = { hinban: 'M-' }
+    const result = searchProducts(products, filter)
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    expect(result.data.results).toHaveLength(4)
+  })
+
+  it('should filter by ec_hinban partial match', () => {
+    const filter: SearchFilter = { ec_hinban: 'EC-00' }
+    const result = searchProducts(products, filter)
+    expect(result.success).toBe(true)
+    if (!result.success) return
     expect(result.data.results).toHaveLength(5)
-    expect(result.data.results.every(r => r.product.width >= 500 && r.product.width <= 1500)).toBe(true)
   })
 
-  it('should filter by inventoryStatus', () => {
-    const filter: SearchFilter = { inventoryStatus: 'EXCESS' }
-    const result = searchProducts(mockProducts, filter)
-
+  it('should filter by color partial match', () => {
+    const filter: SearchFilter = { color: 'シルバー' }
+    const result = searchProducts(products, filter)
     expect(result.success).toBe(true)
     if (!result.success) return
+    expect(result.data.results).toHaveLength(2)
+  })
 
+  it('should filter by freeText across fields', () => {
+    const filter: SearchFilter = { freeText: 'ブラック' }
+    const result = searchProducts(products, filter)
+    expect(result.success).toBe(true)
+    if (!result.success) return
     expect(result.data.results).toHaveLength(1)
-    expect(result.data.results[0].product.inventoryStatus).toBe('EXCESS')
+    expect(result.data.results[0].product.ec_hinban).toBe('EC-002')
   })
 
-  it('should sort by width ascending', () => {
-    const sort: Sort = { field: 'width', order: 'asc' }
-    const result = searchProducts(mockProducts, {}, sort)
-
+  it('should combine multiple filters', () => {
+    const filter: SearchFilter = { zaishitsu: 'SUS304', meopen_um_max: 200 }
+    const result = searchProducts(products, filter)
     expect(result.success).toBe(true)
     if (!result.success) return
-
-    const widths = result.data.results.map(r => r.product.width)
-    expect(widths).toEqual([500, 600, 800, 1000, 1500])
+    expect(result.data.results).toHaveLength(2)
   })
 
-  it('should sort by purchasePrice descending', () => {
-    const sort: Sort = { field: 'purchasePrice', order: 'desc' }
-    const result = searchProducts(mockProducts, {}, sort)
-
+  it('should return empty results when no match', () => {
+    const filter: SearchFilter = { zaishitsu: 'NONEXISTENT' }
+    const result = searchProducts(products, filter)
     expect(result.success).toBe(true)
     if (!result.success) return
-
-    const prices = result.data.results.map(r => r.product.purchasePrice)
-    expect(prices).toEqual([300, 250, 200, 150, 100])
+    expect(result.data.results).toHaveLength(0)
   })
 
-  it('should paginate results - page 1', () => {
-    const result = searchProducts(mockProducts, {}, undefined, 1, 2)
-
+  it('should sort by meopen_um ascending', () => {
+    const sort: Sort = { field: 'meopen_um', order: 'asc' }
+    const result = searchProducts(products, {}, sort)
     expect(result.success).toBe(true)
     if (!result.success) return
+    // null values go last
+    const vals = result.data.results.map(r => r.product.meopen_um)
+    expect(vals).toEqual([50, 100, 300, 600, undefined])
+  })
 
+  it('should sort by shiire_per_m descending', () => {
+    const sort: Sort = { field: 'shiire_per_m', order: 'desc' }
+    const result = searchProducts(products, {}, sort)
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    const vals = result.data.results.map(r => r.product.shiire_per_m)
+    expect(vals).toEqual([800, 500, 200, 150, undefined])
+  })
+
+  it('should paginate results', () => {
+    const result = searchProducts(products, {}, undefined, 1, 2)
+    expect(result.success).toBe(true)
+    if (!result.success) return
     expect(result.data.results).toHaveLength(2)
     expect(result.data.pagination.page).toBe(1)
     expect(result.data.pagination.totalPages).toBe(3)
     expect(result.data.pagination.totalResults).toBe(5)
-    expect(result.data.results.map(r => r.product.id)).toEqual(['1', '2'])
   })
 
-  it('should paginate results - page 2', () => {
-    const result = searchProducts(mockProducts, {}, undefined, 2, 2)
-
+  it('should include calculatedPrice in results', () => {
+    const result = searchProducts(products, { ec_hinban: 'EC-001' })
     expect(result.success).toBe(true)
     if (!result.success) return
-
-    expect(result.data.results).toHaveLength(2)
-    expect(result.data.pagination.page).toBe(2)
-    expect(result.data.pagination.totalPages).toBe(3)
-    expect(result.data.results.map(r => r.product.id)).toEqual(['3', '4'])
+    // (500 * 1 + 6000) / (1 - 0.5) = 13000
+    expect(result.data.results[0].calculatedPrice).toBe(13000)
   })
 
-  it('should map inventoryStatus to correct label', () => {
-    const result = searchProducts(mockProducts, {})
-
+  it('should return null calculatedPrice when shiire_per_m missing', () => {
+    const result = searchProducts(products, { ec_hinban: 'EC-005' })
     expect(result.success).toBe(true)
     if (!result.success) return
+    expect(result.data.results[0].calculatedPrice).toBeNull()
+  })
+})
 
-    const inStockResult = result.data.results.find(r => r.product.inventoryStatus === 'IN_STOCK')
-    const deliveryResult = result.data.results.find(r => r.product.inventoryStatus === 'DELIVERY_INQUIRY')
-    const excessResult = result.data.results.find(r => r.product.inventoryStatus === 'EXCESS')
+describe('mergeOverrides', () => {
+  const baseProducts: UnifiedProduct[] = [
+    createProduct({ ec_hinban: 'A-001', shiire_per_m: 500, kotei_hi: 6000, arari_rate: 0.5 }),
+    createProduct({ ec_hinban: 'A-002', shiire_per_m: 300 }),
+    createProduct({ ec_hinban: 'A-003', shiire_per_m: 100 }),
+  ]
 
-    expect(inStockResult?.inventoryStatusLabel).toBe('在庫あり')
-    expect(deliveryResult?.inventoryStatusLabel).toBe('納期確認')
-    expect(excessResult?.inventoryStatusLabel).toBe('余剰在庫')
+  it('should return products unchanged when no overrides', () => {
+    const overrides = new Map<string, ProductOverride>()
+    const { merged, overriddenKeys } = mergeOverrides(baseProducts, overrides)
+    expect(merged).toEqual(baseProducts)
+    expect(overriddenKeys.size).toBe(0)
   })
 
-  it('should set hasAlternatives to true when stockQuantity is 0', () => {
-    const result = searchProducts(mockProducts, {})
-
-    expect(result.success).toBe(true)
-    if (!result.success) return
-
-    const zeroStockResult = result.data.results.find(r => r.product.stockQuantity === 0)
-    const inStockResult = result.data.results.find(r => r.product.stockQuantity > 0)
-
-    expect(zeroStockResult?.hasAlternatives).toBe(true)
-    expect(inStockResult?.hasAlternatives).toBe(false)
+  it('should override shiire_per_m for matched product', () => {
+    const overrides = new Map<string, ProductOverride>([
+      ['A-001', { shiire_per_m: 800, updated_at: '2026-06-18T00:00:00Z' }],
+    ])
+    const { merged, overriddenKeys } = mergeOverrides(baseProducts, overrides)
+    expect(merged[0].shiire_per_m).toBe(800)
+    expect(merged[1].shiire_per_m).toBe(300) // untouched
+    expect(overriddenKeys.has('A-001')).toBe(true)
+    expect(overriddenKeys.has('A-002')).toBe(false)
   })
 
-  it('should include EC price in SearchResult', () => {
-    const result = searchProducts(mockProducts, {})
-
-    expect(result.success).toBe(true)
-    if (!result.success) return
-
-    const searchResult = result.data.results[0]
-    expect(searchResult.calculatedPrice).toBeDefined()
-    expect(searchResult.calculatedPrice.unitPrice).toBeGreaterThan(0)
-    expect(searchResult.calculatedPrice.unitPriceWithTax).toBeGreaterThan(0)
+  it('should override kotei_hi and arari_rate independently', () => {
+    const overrides = new Map<string, ProductOverride>([
+      ['A-002', { kotei_hi: 3000, updated_at: '2026-06-18T00:00:00Z' }],
+    ])
+    const { merged } = mergeOverrides(baseProducts, overrides)
+    expect(merged[1].kotei_hi).toBe(3000)
+    expect(merged[1].shiire_per_m).toBe(300) // base value kept
   })
 
-  it('should combine multiple filters', () => {
-    const filter: SearchFilter = {
-      productType: 'mesh',
-      width: { min: 500, max: 1000 },
-    }
-    const result = searchProducts(mockProducts, filter)
-
-    expect(result.success).toBe(true)
-    if (!result.success) return
-
-    expect(result.data.results).toHaveLength(3)
-    expect(result.data.results.every(r => r.product.productType === 'mesh')).toBe(true)
-    expect(result.data.results.every(r => r.product.width >= 500 && r.product.width <= 1000)).toBe(true)
-  })
-
-  it('should return empty results when no products match filter', () => {
-    const filter: SearchFilter = { productCode: 'NONEXISTENT' }
-    const result = searchProducts(mockProducts, filter)
-
-    expect(result.success).toBe(true)
-    if (!result.success) return
-
-    expect(result.data.results).toHaveLength(0)
-    expect(result.data.pagination.totalResults).toBe(0)
+  it('should ignore overrides for non-existent products (CSV rebuilt)', () => {
+    const overrides = new Map<string, ProductOverride>([
+      ['DELETED-001', { shiire_per_m: 999, updated_at: '2026-06-18T00:00:00Z' }],
+    ])
+    const { merged, overriddenKeys } = mergeOverrides(baseProducts, overrides)
+    expect(merged).toEqual(baseProducts)
+    expect(overriddenKeys.size).toBe(0)
   })
 })
