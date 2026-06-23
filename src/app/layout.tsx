@@ -11,8 +11,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const navItems = [
     { href: '/', label: 'ホーム' },
     { href: '/search', label: '商品検索' },
-    { href: '/dataflow', label: 'データフロー' },
-    { href: '/dataflow/confirm', label: '要件確認' },
     { href: '/overview', label: '全体像' },
   ]
 
