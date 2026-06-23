@@ -240,9 +240,9 @@ def main():
             p.cut_m,
             {DEFAULT_ARARI} AS arari_rate,
             {DEFAULT_KOTEIHI} AS kotei_hi,
-            CASE WHEN COALESCE(zk.shiire_per_m, zh.shiire_per_m) IS NOT NULL
+            CASE WHEN COALESCE(zk.shiire_per_m, zh.shiire_per_m, zs.shiire_per_m) IS NOT NULL
                       AND p.cut_m IS NOT NULL
-                 THEN ROUND((COALESCE(zk.shiire_per_m, zh.shiire_per_m) * p.cut_m
+                 THEN ROUND((COALESCE(zk.shiire_per_m, zh.shiire_per_m, zs.shiire_per_m) * p.cut_m
                              + {DEFAULT_KOTEIHI}) / (1 - {DEFAULT_ARARI}))
             END AS hanbai_kakaku,
             NULL AS shiire_changed_date,
@@ -272,7 +272,7 @@ def main():
             END AS kaikouritsu,
             CASE WHEN zk.key IS NOT NULL THEN 'key'
                  WHEN zh.hinban_u IS NOT NULL THEN 'hinban+haba'
-                 WHEN zs.hinban_u IS NOT NULL THEN 'hinban(単一幅)' END AS zaiko_match,
+                 WHEN zs.hinban_u IS NOT NULL THEN 'hinban' END AS zaiko_match,
             CASE
                 WHEN zk.key IS NOT NULL OR zh.hinban_u IS NOT NULL
                      OR zs.hinban_u IS NOT NULL THEN '突合OK'
@@ -311,9 +311,8 @@ def main():
                           MAX(mesh_count) AS mesh_count,
                           MAX(CAST(haba_mm AS REAL)) AS zaiko_haba_mm
                    FROM zaiko WHERE hinban IS NOT NULL GROUP BY 1
-                   HAVING COUNT(DISTINCT haba_mm) = 1
         ) zs ON zs.hinban_u = UPPER(TRIM(p.hinban))
-            AND p.haba_mm IS NULL AND zk.key IS NULL""")
+            AND zk.key IS NULL AND zh.hinban_u IS NULL""")
 
     con.commit()
 
