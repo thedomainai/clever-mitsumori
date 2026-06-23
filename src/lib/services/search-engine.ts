@@ -52,6 +52,38 @@ function matchesFilter(product: UnifiedProduct, filters: SearchFilter): boolean 
     if (product.meopen_um == null || product.meopen_um > filters.meopen_um_max) return false
   }
 
+  if (filters.mesh_count_min != null) {
+    if (product.mesh_count == null || product.mesh_count < filters.mesh_count_min) return false
+  }
+
+  if (filters.mesh_count_max != null) {
+    if (product.mesh_count == null || product.mesh_count > filters.mesh_count_max) return false
+  }
+
+  if (filters.senkei_um_min != null) {
+    if (product.senkei_um == null || product.senkei_um < filters.senkei_um_min) return false
+  }
+
+  if (filters.senkei_um_max != null) {
+    if (product.senkei_um == null || product.senkei_um > filters.senkei_um_max) return false
+  }
+
+  if (filters.kaikouritsu_min != null) {
+    if (product.kaikouritsu == null || product.kaikouritsu < filters.kaikouritsu_min) return false
+  }
+
+  if (filters.kaikouritsu_max != null) {
+    if (product.kaikouritsu == null || product.kaikouritsu > filters.kaikouritsu_max) return false
+  }
+
+  if (filters.haba_mm_min != null) {
+    if (product.zaiko_haba_mm == null || product.zaiko_haba_mm < filters.haba_mm_min) return false
+  }
+
+  if (filters.haba_mm_max != null) {
+    if (product.zaiko_haba_mm == null || product.zaiko_haba_mm > filters.haba_mm_max) return false
+  }
+
   if (filters.hinban) {
     if (!product.hinban) return false
     const normalized = normalizeString(filters.hinban)

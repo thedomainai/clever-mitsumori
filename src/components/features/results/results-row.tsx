@@ -40,6 +40,18 @@ export default function ResultsRow({ result, override, onSaveOverride }: Results
       <TableCell className="text-right tabular-nums">
         {product.meopen_um != null ? `${product.meopen_um}` : '-'}
       </TableCell>
+      <TableCell className="text-right tabular-nums">
+        {product.mesh_count != null ? `${product.mesh_count}` : '-'}
+      </TableCell>
+      <TableCell className="text-right tabular-nums">
+        {product.senkei_um != null ? `${product.senkei_um}` : '-'}
+      </TableCell>
+      <TableCell className="text-right tabular-nums">
+        {product.kaikouritsu != null ? `${product.kaikouritsu}` : '-'}
+      </TableCell>
+      <TableCell className="text-right tabular-nums">
+        {product.zaiko_haba_mm != null ? `${product.zaiko_haba_mm}` : '-'}
+      </TableCell>
       <TableCell className="text-xs max-w-[120px] truncate">{product.size ?? '-'}</TableCell>
       <TableCell>{product.color ?? '-'}</TableCell>
       <EditableCell

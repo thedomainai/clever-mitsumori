@@ -27,6 +27,7 @@ export type UnifiedProduct = {
   color?: string
   size?: string
   tehai?: string
+  haba_mm?: number
   cut_m?: number
   arari_rate?: number
   kotei_hi?: number
@@ -42,7 +43,11 @@ export type UnifiedProduct = {
   shiire_per_m?: number
   nokori_m?: number
   zaiko_source?: string
+  zaiko_haba_mm?: number
   meopen_um?: number
+  mesh_count?: number
+  senkei_um?: number
+  kaikouritsu?: number
   zaiko_match?: string
   zaiko_status?: string
 }
@@ -55,11 +60,19 @@ export type ProductOverride = {
   updated_at: string // ISO 8601
 }
 
-// Search filter (mesh-focused for Phase 1)
+// Search filter
 export type SearchFilter = {
   zaishitsu?: string
   meopen_um_min?: number
   meopen_um_max?: number
+  mesh_count_min?: number
+  mesh_count_max?: number
+  senkei_um_min?: number
+  senkei_um_max?: number
+  kaikouritsu_min?: number
+  kaikouritsu_max?: number
+  haba_mm_min?: number
+  haba_mm_max?: number
   hinban?: string
   ec_hinban?: string
   color?: string
@@ -68,7 +81,7 @@ export type SearchFilter = {
 
 // Sort
 export type Sort = {
-  field: 'hinban' | 'meopen_um' | 'shiire_per_m' | 'hanbai_kakaku' | 'ec_hinban' | 'zaishitsu'
+  field: 'hinban' | 'meopen_um' | 'mesh_count' | 'senkei_um' | 'kaikouritsu' | 'zaiko_haba_mm' | 'shiire_per_m' | 'hanbai_kakaku' | 'ec_hinban' | 'zaishitsu'
   order: 'asc' | 'desc'
 }
 

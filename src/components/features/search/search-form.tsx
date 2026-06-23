@@ -14,6 +14,14 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
   const [zaishitsu, setZaishitsu] = useState('')
   const [meopenMin, setMeopenMin] = useState('')
   const [meopenMax, setMeopenMax] = useState('')
+  const [meshCountMin, setMeshCountMin] = useState('')
+  const [meshCountMax, setMeshCountMax] = useState('')
+  const [senkeiMin, setSenkeiMin] = useState('')
+  const [senkeiMax, setSenkeiMax] = useState('')
+  const [kaikouritsuMin, setKaikouritsuMin] = useState('')
+  const [kaikouritsuMax, setKaikouritsuMax] = useState('')
+  const [habaMin, setHabaMin] = useState('')
+  const [habaMax, setHabaMax] = useState('')
   const [hinban, setHinban] = useState('')
   const [ecHinban, setEcHinban] = useState('')
   const [color, setColor] = useState('')
@@ -25,6 +33,14 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
     if (zaishitsu) filters.zaishitsu = zaishitsu
     if (meopenMin) filters.meopen_um_min = parseFloat(meopenMin)
     if (meopenMax) filters.meopen_um_max = parseFloat(meopenMax)
+    if (meshCountMin) filters.mesh_count_min = parseFloat(meshCountMin)
+    if (meshCountMax) filters.mesh_count_max = parseFloat(meshCountMax)
+    if (senkeiMin) filters.senkei_um_min = parseFloat(senkeiMin)
+    if (senkeiMax) filters.senkei_um_max = parseFloat(senkeiMax)
+    if (kaikouritsuMin) filters.kaikouritsu_min = parseFloat(kaikouritsuMin)
+    if (kaikouritsuMax) filters.kaikouritsu_max = parseFloat(kaikouritsuMax)
+    if (habaMin) filters.haba_mm_min = parseFloat(habaMin)
+    if (habaMax) filters.haba_mm_max = parseFloat(habaMax)
     if (hinban) filters.hinban = hinban
     if (ecHinban) filters.ec_hinban = ecHinban
     if (color) filters.color = color
@@ -37,6 +53,14 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
     setZaishitsu('')
     setMeopenMin('')
     setMeopenMax('')
+    setMeshCountMin('')
+    setMeshCountMax('')
+    setSenkeiMin('')
+    setSenkeiMax('')
+    setKaikouritsuMin('')
+    setKaikouritsuMax('')
+    setHabaMin('')
+    setHabaMax('')
     setHinban('')
     setEcHinban('')
     setColor('')
@@ -63,18 +87,82 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
           />
           <div className="flex gap-2">
             <Input
-              label="目開き(μ) 最小"
+              label="目開き(μm) 最小"
               type="number"
               placeholder="最小"
               value={meopenMin}
               onChange={(e) => setMeopenMin(e.target.value)}
             />
             <Input
-              label="目開き(μ) 最大"
+              label="目開き(μm) 最大"
               type="number"
               placeholder="最大"
               value={meopenMax}
               onChange={(e) => setMeopenMax(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Input
+              label="メッシュ数 最小"
+              type="number"
+              placeholder="最小"
+              value={meshCountMin}
+              onChange={(e) => setMeshCountMin(e.target.value)}
+            />
+            <Input
+              label="メッシュ数 最大"
+              type="number"
+              placeholder="最大"
+              value={meshCountMax}
+              onChange={(e) => setMeshCountMax(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Input
+              label="線径(μm) 最小"
+              type="number"
+              placeholder="最小"
+              value={senkeiMin}
+              onChange={(e) => setSenkeiMin(e.target.value)}
+            />
+            <Input
+              label="線径(μm) 最大"
+              type="number"
+              placeholder="最大"
+              value={senkeiMax}
+              onChange={(e) => setSenkeiMax(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Input
+              label="開口率(%) 最小"
+              type="number"
+              placeholder="最小"
+              value={kaikouritsuMin}
+              onChange={(e) => setKaikouritsuMin(e.target.value)}
+            />
+            <Input
+              label="開口率(%) 最大"
+              type="number"
+              placeholder="最大"
+              value={kaikouritsuMax}
+              onChange={(e) => setKaikouritsuMax(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Input
+              label="幅(mm) 最小"
+              type="number"
+              placeholder="最小"
+              value={habaMin}
+              onChange={(e) => setHabaMin(e.target.value)}
+            />
+            <Input
+              label="幅(mm) 最大"
+              type="number"
+              placeholder="最大"
+              value={habaMax}
+              onChange={(e) => setHabaMax(e.target.value)}
             />
           </div>
           <Input
