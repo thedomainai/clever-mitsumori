@@ -27,7 +27,6 @@ export type UnifiedProduct = {
   color?: string
   size?: string
   tehai?: string
-  haba_mm?: number
   cut_m?: number
   arari_rate?: number
   kotei_hi?: number
@@ -71,8 +70,8 @@ export type SearchFilter = {
   senkei_um_max?: number
   kaikouritsu_min?: number
   kaikouritsu_max?: number
-  haba_mm_min?: number
-  haba_mm_max?: number
+  zaiko_haba_mm_min?: number
+  zaiko_haba_mm_max?: number
   hinban?: string
   ec_hinban?: string
   color?: string

@@ -39,8 +39,8 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
     if (senkeiMax) filters.senkei_um_max = parseFloat(senkeiMax)
     if (kaikouritsuMin) filters.kaikouritsu_min = parseFloat(kaikouritsuMin)
     if (kaikouritsuMax) filters.kaikouritsu_max = parseFloat(kaikouritsuMax)
-    if (habaMin) filters.haba_mm_min = parseFloat(habaMin)
-    if (habaMax) filters.haba_mm_max = parseFloat(habaMax)
+    if (habaMin) filters.zaiko_haba_mm_min = parseFloat(habaMin)
+    if (habaMax) filters.zaiko_haba_mm_max = parseFloat(habaMax)
     if (hinban) filters.hinban = hinban
     if (ecHinban) filters.ec_hinban = ecHinban
     if (color) filters.color = color

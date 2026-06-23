@@ -1,5 +1,6 @@
 import type { Result, UnifiedProduct, ProductOverride, SearchFilter, Sort, SearchResult, Pagination } from '../types'
 import { calculateEcPrice } from './price-calculator'
+import { SEARCH_CONFIG } from '../constants'
 
 type OverrideMap = Map<string, ProductOverride>
 
@@ -76,12 +77,12 @@ function matchesFilter(product: UnifiedProduct, filters: SearchFilter): boolean 
     if (product.kaikouritsu == null || product.kaikouritsu > filters.kaikouritsu_max) return false
   }
 
-  if (filters.haba_mm_min != null) {
-    if (product.zaiko_haba_mm == null || product.zaiko_haba_mm < filters.haba_mm_min) return false
+  if (filters.zaiko_haba_mm_min != null) {
+    if (product.zaiko_haba_mm == null || product.zaiko_haba_mm < filters.zaiko_haba_mm_min) return false
   }
 
-  if (filters.haba_mm_max != null) {
-    if (product.zaiko_haba_mm == null || product.zaiko_haba_mm > filters.haba_mm_max) return false
+  if (filters.zaiko_haba_mm_max != null) {
+    if (product.zaiko_haba_mm == null || product.zaiko_haba_mm > filters.zaiko_haba_mm_max) return false
   }
 
   if (filters.hinban) {
@@ -148,7 +149,7 @@ export function searchProducts(
   filters: SearchFilter,
   sort?: Sort,
   page: number = 1,
-  pageSize: number = 50
+  pageSize: number = SEARCH_CONFIG.defaultPageSize
 ): Result<{ results: SearchResult[]; pagination: Pagination }> {
   try {
     const filtered = products.filter((product) => matchesFilter(product, filters))
