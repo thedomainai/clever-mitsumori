@@ -151,14 +151,17 @@ def main():
     cur.execute("""CREATE TABLE zaiko (
         source TEXT, area TEXT, tana TEXT, zaishitsu TEXT, hinban TEXT,
         kyotsu_key TEXT, color TEXT, haba_mm TEXT, meopen_um REAL,
+        mesh_count REAL,
         nyuka_date TEXT, last_shukka TEXT, nokori_m REAL,
         shiire_per_m REAL, biko TEXT, key TEXT)""")
 
     def add_zaiko(source, area, tana, zaishitsu, hinban, kyotsu, color,
-                  haba, meopen, nyuka, shukka, nokori, shiire, biko=None):
-        cur.execute("INSERT INTO zaiko VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                  haba, meopen, nyuka, shukka, nokori, shiire, biko=None,
+                  mesh_count=None):
+        cur.execute("INSERT INTO zaiko VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     (source, area, tana, zaishitsu, hinban, kyotsu, color, haba,
-                     to_num(meopen), nyuka, shukka, to_num(nokori), to_num(shiire),
+                     to_num(meopen), to_num(mesh_count),
+                     nyuka, shukka, to_num(nokori), to_num(shiire),
                      biko, zaiko_key_to_code(kyotsu)))
 
     for r in read_csv("zaiko-mesh.csv")[1:]:
@@ -168,8 +171,13 @@ def main():
         # サラン N-24 → saran-N-24（products 側の品番と一致させる）
         if (r[2] or '').strip() == 'ｻﾗﾝ' and (r[3] or '').strip() == 'N-24':
             r[3] = 'saran-N-24'
+        # r[7] = "ﾒｯｼｭor 線径" 列。"156/200" のような複合値は先頭を採用
+        mesh_raw = (r[7] or '').strip()
+        if '/' in mesh_raw:
+            mesh_raw = mesh_raw.split('/')[0].strip()
         add_zaiko("mesh", r[0], r[1], r[2], r[3], r[4], None, r[6],
-                  r[5], r[8], r[9], r[10], r[11], r[15])
+                  r[5], r[8], r[9], r[10], r[11], r[15],
+                  mesh_count=mesh_raw)
     for r in read_csv("zaiko-netoron.csv")[1:]:
         r = (r + [None] * 12)[:12]
         if not (r[2] or r[3]):
@@ -220,13 +228,15 @@ def main():
         SELECT key, UPPER(TRIM(hinban)) AS hinban_u, haba_mm,
                MAX(shiire_per_m) AS shiire_per_m,
                SUM(nokori_m) AS nokori_m, MIN(source) AS source,
-               MAX(meopen_um) AS meopen_um
+               MAX(meopen_um) AS meopen_um,
+               MAX(mesh_count) AS mesh_count
         FROM zaiko GROUP BY key, UPPER(TRIM(hinban)), haba_mm""")
     cur.execute(f"""CREATE VIEW unified AS
         SELECT
             COALESCE(p.yahoo_code, p.amazon_sku, p.rakuten_code) AS ec_hinban,
             p.rakuten_code, p.yahoo_code, p.amazon_sku, p.asin,
             p.zaishitsu, p.hinban, p.color, p.size, p.tehai,
+            CAST(p.haba_mm AS REAL) AS haba_mm,
             p.cut_m,
             {DEFAULT_ARARI} AS arari_rate,
             {DEFAULT_KOTEIHI} AS kotei_hi,
@@ -243,7 +253,23 @@ def main():
             COALESCE(zk.shiire_per_m, zh.shiire_per_m, zs.shiire_per_m) AS shiire_per_m,
             COALESCE(zk.nokori_m,     zh.nokori_m,     zs.nokori_m)     AS nokori_m,
             COALESCE(zk.source,       zh.source,       zs.source)       AS zaiko_source,
+            COALESCE(zk.zaiko_haba_mm, CAST(zh.haba_mm AS REAL), zs.zaiko_haba_mm) AS zaiko_haba_mm,
             COALESCE(zk.meopen_um,    zh.meopen_um,    zs.meopen_um)    AS meopen_um,
+            COALESCE(zk.mesh_count,  zh.mesh_count,  zs.mesh_count)  AS mesh_count,
+            CASE WHEN COALESCE(zk.mesh_count, zh.mesh_count, zs.mesh_count) IS NOT NULL
+                      AND COALESCE(zk.meopen_um, zh.meopen_um, zs.meopen_um) IS NOT NULL
+                      AND COALESCE(zk.mesh_count, zh.mesh_count, zs.mesh_count) > 0
+                 THEN ROUND(25400.0 / COALESCE(zk.mesh_count, zh.mesh_count, zs.mesh_count)
+                            - COALESCE(zk.meopen_um, zh.meopen_um, zs.meopen_um), 1)
+            END AS senkei_um,
+            CASE WHEN COALESCE(zk.mesh_count, zh.mesh_count, zs.mesh_count) IS NOT NULL
+                      AND COALESCE(zk.meopen_um, zh.meopen_um, zs.meopen_um) IS NOT NULL
+                      AND COALESCE(zk.mesh_count, zh.mesh_count, zs.mesh_count) > 0
+                 THEN ROUND(
+                    POWER(COALESCE(zk.meopen_um, zh.meopen_um, zs.meopen_um)
+                          / (25400.0 / COALESCE(zk.mesh_count, zh.mesh_count, zs.mesh_count)),
+                          2) * 100, 1)
+            END AS kaikouritsu,
             CASE WHEN zk.key IS NOT NULL THEN 'key'
                  WHEN zh.hinban_u IS NOT NULL THEN 'hinban+haba'
                  WHEN zs.hinban_u IS NOT NULL THEN 'hinban(単一幅)' END AS zaiko_match,
@@ -265,20 +291,25 @@ def main():
         LEFT JOIN amazon_prices  a ON a.key = p.amazon_key
         LEFT JOIN (SELECT key, MAX(shiire_per_m) AS shiire_per_m,
                           SUM(nokori_m) AS nokori_m, MIN(source) AS source,
-                          MAX(meopen_um) AS meopen_um
+                          MAX(meopen_um) AS meopen_um,
+                          MAX(mesh_count) AS mesh_count,
+                          MAX(CAST(haba_mm AS REAL)) AS zaiko_haba_mm
                    FROM zaiko WHERE key IS NOT NULL GROUP BY key
         ) zk ON zk.key = p.rakuten_key
         LEFT JOIN (SELECT UPPER(TRIM(hinban)) AS hinban_u, haba_mm,
                           MAX(shiire_per_m) AS shiire_per_m,
                           SUM(nokori_m) AS nokori_m, MIN(source) AS source,
-                          MAX(meopen_um) AS meopen_um
+                          MAX(meopen_um) AS meopen_um,
+                          MAX(mesh_count) AS mesh_count
                    FROM zaiko WHERE hinban IS NOT NULL GROUP BY 1, 2
         ) zh ON zh.hinban_u = UPPER(TRIM(p.hinban))
             AND zh.haba_mm = p.haba_mm AND zk.key IS NULL
         LEFT JOIN (SELECT UPPER(TRIM(hinban)) AS hinban_u,
                           MAX(shiire_per_m) AS shiire_per_m,
                           SUM(nokori_m) AS nokori_m, MIN(source) AS source,
-                          MAX(meopen_um) AS meopen_um
+                          MAX(meopen_um) AS meopen_um,
+                          MAX(mesh_count) AS mesh_count,
+                          MAX(CAST(haba_mm AS REAL)) AS zaiko_haba_mm
                    FROM zaiko WHERE hinban IS NOT NULL GROUP BY 1
                    HAVING COUNT(DISTINCT haba_mm) = 1
         ) zs ON zs.hinban_u = UPPER(TRIM(p.hinban))
