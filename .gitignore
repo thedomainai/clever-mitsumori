@@ -29,6 +29,9 @@ Thumbs.db
 *.proposed
 *.backup
 
+# Playwright MCP
+.playwright-mcp/
+
 # Business documents (not part of web app)
 *.pdf
 *.xlsx
