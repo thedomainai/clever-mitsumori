@@ -1,1 +1,1 @@
-export { PRICE_CONFIG } from './price-config'
+export { PRICE_CONFIG, SEARCH_CONFIG } from './price-config'

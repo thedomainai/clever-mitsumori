@@ -4,3 +4,7 @@ export const PRICE_CONFIG = {
   defaultGrossMarginRate: 0.5,
   defaultFixedCost: 6000,
 } as const
+
+export const SEARCH_CONFIG = {
+  defaultPageSize: 100,
+} as const

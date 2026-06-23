@@ -4,12 +4,13 @@ import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { UnifiedProduct, SearchFilter, SearchResult, Pagination, Sort } from '@/lib/types'
 import type { OverrideMap } from './use-product-overrides'
 import { searchProducts, mergeOverrides } from '@/lib/services/search-engine'
+import { SEARCH_CONFIG } from '@/lib/constants'
 
 export function useSearch(products: UnifiedProduct[], overrides: OverrideMap) {
   const [results, setResults] = useState<SearchResult[]>([])
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
-    pageSize: 100,
+    pageSize: SEARCH_CONFIG.defaultPageSize,
     totalResults: 0,
     totalPages: 0,
   })
@@ -26,7 +27,7 @@ export function useSearch(products: UnifiedProduct[], overrides: OverrideMap) {
 
   const executeSearch = useCallback(
     (filters: SearchFilter, page: number = 1, sort?: Sort) => {
-      const result = searchProducts(merged, filters, sort, page, 100)
+      const result = searchProducts(merged, filters, sort, page, SEARCH_CONFIG.defaultPageSize)
 
       if (result.success) {
         // Tag each result with overridden flag
@@ -40,7 +41,7 @@ export function useSearch(products: UnifiedProduct[], overrides: OverrideMap) {
         return true
       } else {
         setResults([])
-        setPagination({ page: 1, pageSize: 100, totalResults: 0, totalPages: 0 })
+        setPagination({ page: 1, pageSize: SEARCH_CONFIG.defaultPageSize, totalResults: 0, totalPages: 0 })
         return false
       }
     },
