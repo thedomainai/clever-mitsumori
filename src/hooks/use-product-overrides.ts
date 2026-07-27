@@ -68,7 +68,10 @@ export function useProductOverrides() {
 
   const saveOverride = useCallback(
     async (ecHinban: string, fields: Partial<Omit<ProductOverride, 'updated_at'>>) => {
-      if (!db) return
+      if (!db) {
+        console.error('オーバーライドを保存できません: Firestore が未設定です')
+        return
+      }
 
       const existing = overrides.get(ecHinban)
       const merged: ProductOverride = {
@@ -89,7 +92,10 @@ export function useProductOverrides() {
   )
 
   const removeOverride = useCallback(async (ecHinban: string) => {
-    if (!db) return
+    if (!db) {
+      console.error('オーバーライドを削除できません: Firestore が未設定です')
+      return
+    }
     await deleteDoc(doc(db, COLLECTION, ecHinban))
   }, [])
 

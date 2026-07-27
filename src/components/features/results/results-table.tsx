@@ -18,6 +18,8 @@ export interface ResultsTableProps {
   sortDirection: 'asc' | 'desc' | null
   overrides: OverrideMap
   onSaveOverride: (ecHinban: string, fields: Partial<Omit<ProductOverride, 'updated_at'>>) => void
+  /** When false, the editable columns render as plain text */
+  canEdit: boolean
 }
 
 export default function ResultsTable({
@@ -31,6 +33,7 @@ export default function ResultsTable({
   sortDirection,
   overrides,
   onSaveOverride,
+  canEdit,
 }: ResultsTableProps) {
   const headers = [
     { key: 'ec_hinban', label: 'EC品番' },
@@ -104,6 +107,7 @@ export default function ResultsTable({
               result={result}
               override={overrides.get(result.product.ec_hinban)}
               onSaveOverride={onSaveOverride}
+              canEdit={canEdit}
             />
           ))}
         </Table>

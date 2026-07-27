@@ -7,6 +7,7 @@ import { useProductOverrides } from '@/hooks/use-product-overrides'
 import { useSearch } from '@/hooks/use-search'
 import type { SearchFilter } from '@/lib/types'
 import LoadingSpinner from '@/components/ui/loading-spinner'
+import { isFirebaseConfigured } from '@/lib/firebase'
 
 const CATEGORIES = [
   { key: 'mesh', label: 'メッシュ', active: true },
@@ -77,6 +78,17 @@ export default function SearchPage() {
         ))}
       </div>
 
+      {!isFirebaseConfigured && (
+        <div className="rounded-lg border border-slate-300 bg-slate-50 px-4 py-3">
+          <p className="text-sm font-medium text-slate-900">
+            仕入値・固定費・粗利率の編集は現在無効です
+          </p>
+          <p className="mt-1 text-sm text-slate-500">
+            保存先（Firestore）が未設定のため、変更しても保存されません。表示中の値は元データの値です。
+          </p>
+        </div>
+      )}
+
       <SearchForm onSearch={handleSearch} />
 
       <ResultsTable
@@ -91,6 +103,7 @@ export default function SearchPage() {
         sortDirection={sortDirection}
         overrides={overrides}
         onSaveOverride={saveOverride}
+        canEdit={isFirebaseConfigured}
       />
     </div>
   )

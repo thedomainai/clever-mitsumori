@@ -9,6 +9,8 @@ export interface ResultsRowProps {
   result: SearchResult
   override?: ProductOverride
   onSaveOverride: (ecHinban: string, fields: Partial<Omit<ProductOverride, 'updated_at'>>) => void
+  /** When false, the editable columns render as plain text */
+  canEdit: boolean
 }
 
 function formatPrice(price: number | undefined | null): string {
@@ -26,7 +28,7 @@ function formatPercent(rate: number | undefined | null): string {
   return `${(rate * 100).toFixed(0)}%`
 }
 
-export default function ResultsRow({ result, override, onSaveOverride }: ResultsRowProps) {
+export default function ResultsRow({ result, override, onSaveOverride, canEdit }: ResultsRowProps) {
   const { product, calculatedPrice } = result
   const ecHinban = product.ec_hinban
 
@@ -59,12 +61,14 @@ export default function ResultsRow({ result, override, onSaveOverride }: Results
         format={formatPrice}
         isOverridden={override?.shiire_per_m != null}
         onSave={(v) => onSaveOverride(ecHinban, { shiire_per_m: v })}
+        readOnly={!canEdit}
       />
       <EditableCell
         value={product.kotei_hi ?? PRICE_CONFIG.defaultFixedCost}
         format={formatPrice}
         isOverridden={override?.kotei_hi != null}
         onSave={(v) => onSaveOverride(ecHinban, { kotei_hi: v })}
+        readOnly={!canEdit}
       />
       <EditableCell
         value={product.arari_rate ?? PRICE_CONFIG.defaultGrossMarginRate}
@@ -73,6 +77,7 @@ export default function ResultsRow({ result, override, onSaveOverride }: Results
         onSave={(v) => onSaveOverride(ecHinban, { arari_rate: v })}
         inputSuffix="%"
         editScale={100}
+        readOnly={!canEdit}
       />
       <TableCell className="text-right tabular-nums font-medium">
         {formatPrice(calculatedPrice)}

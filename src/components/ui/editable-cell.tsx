@@ -12,6 +12,8 @@ export interface EditableCellProps {
   inputSuffix?: string
   /** Multiply display value by this factor for editing (e.g. 100 for percentages) */
   editScale?: number
+  /** Disable editing entirely (e.g. when the override backend is unavailable) */
+  readOnly?: boolean
 }
 
 export default function EditableCell({
@@ -22,6 +24,7 @@ export default function EditableCell({
   className = '',
   inputSuffix,
   editScale = 1,
+  readOnly = false,
 }: EditableCellProps) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
@@ -35,10 +38,11 @@ export default function EditableCell({
   }, [editing])
 
   const startEdit = useCallback(() => {
+    if (readOnly) return
     const displayValue = value != null ? (value * editScale) : ''
     setDraft(String(displayValue))
     setEditing(true)
-  }, [value, editScale])
+  }, [value, editScale, readOnly])
 
   const commit = useCallback(() => {
     setEditing(false)
@@ -68,6 +72,26 @@ export default function EditableCell({
     },
     [commit, cancel],
   )
+
+  if (readOnly) {
+    return (
+      <td
+        className={`
+          px-4 py-3 text-right tabular-nums text-sm
+          ${isOverridden ? 'text-slate-700 font-medium' : 'text-slate-500'}
+          ${className}
+        `}
+        title="編集は無効です（保存先が未設定のため）"
+      >
+        <span className="inline-flex items-center gap-1">
+          {format(value)}
+          {isOverridden && (
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+          )}
+        </span>
+      </td>
+    )
+  }
 
   if (editing) {
     return (
