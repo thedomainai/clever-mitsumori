@@ -1,6 +1,8 @@
 import type { Result, UnifiedProduct, ProductOverride, SearchFilter, Sort, SearchResult, Pagination } from '../types'
 import { calculateEcPrice } from './price-calculator'
 import { SEARCH_CONFIG } from '../constants'
+import { getStockStatus } from '../constants/stock-status'
+import { getMaterialProperties, meetsGrade } from '../constants/material-properties'
 
 type OverrideMap = Map<string, ProductOverride>
 
@@ -116,6 +118,21 @@ function matchesFilter(product: UnifiedProduct, filters: SearchFilter): boolean 
     ]
     const combined = fields.filter(Boolean).map(f => normalizeString(f!)).join(' ')
     if (!combined.includes(q)) return false
+  }
+
+  if (filters.stockStatus) {
+    if (getStockStatus(product) !== filters.stockStatus) return false
+  }
+
+  if (filters.heatMaxC_min != null || filters.acidResistantOnly || filters.alkaliResistantOnly || filters.solventResistantOnly) {
+    const props = getMaterialProperties(product.zaishitsu)
+    if (!props) return false
+    if (filters.heatMaxC_min != null) {
+      if (props.heatMaxC == null || props.heatMaxC < filters.heatMaxC_min) return false
+    }
+    if (filters.acidResistantOnly && !meetsGrade(props.acid, '◎')) return false
+    if (filters.alkaliResistantOnly && !meetsGrade(props.alkali, '◎')) return false
+    if (filters.solventResistantOnly && !meetsGrade(props.solvent, '◎')) return false
   }
 
   return true

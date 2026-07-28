@@ -44,21 +44,23 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
     return pages
   }
 
+  const navButtonClass =
+    'inline-flex items-center gap-1 h-9 px-3 text-sm font-medium text-stone-600 hover:bg-stone-200/60 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent'
+
   return (
-    <div className="flex items-center justify-center gap-1">
-      <button
-        onClick={handlePrevious}
-        disabled={currentPage === 1}
-        className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-      >
+    <div className="flex items-center justify-center gap-1 pt-1">
+      <button onClick={handlePrevious} disabled={currentPage === 1} className={navButtonClass}>
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
         前へ
       </button>
 
       {getPageNumbers().map((page, index) => {
         if (page === '...') {
           return (
-            <span key={`ellipsis-${index}`} className="px-2 text-sm text-slate-400">
-              ...
+            <span key={`ellipsis-${index}`} className="px-1.5 text-sm text-stone-400">
+              …
             </span>
           )
         }
@@ -69,10 +71,10 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
             key={page}
             onClick={() => onPageChange(page as number)}
             className={`
-              w-8 h-8 text-sm font-medium rounded-lg transition-all duration-150
+              min-w-9 h-9 px-2 text-sm font-medium rounded-md tabular-nums transition-colors duration-150
               ${isActive
-                ? 'bg-indigo-600 text-white'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-stone-900 text-white'
+                : 'text-stone-600 hover:bg-stone-200/60'
               }
             `}
           >
@@ -81,12 +83,11 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         )
       })}
 
-      <button
-        onClick={handleNext}
-        disabled={currentPage === totalPages}
-        className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-      >
+      <button onClick={handleNext} disabled={currentPage === totalPages} className={navButtonClass}>
         次へ
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
       </button>
     </div>
   )

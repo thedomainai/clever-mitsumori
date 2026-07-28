@@ -13,19 +13,24 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', loading = false, disabled, className = '', children, ...props }, ref) => {
-    const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed'
+    const baseClasses =
+      'inline-flex items-center justify-center font-medium select-none transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99]'
 
     const variantClasses: Record<ButtonVariant, string> = {
-      primary: 'bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white shadow-sm focus-visible:outline-indigo-600',
-      secondary: 'bg-white ring-1 ring-inset ring-slate-300 hover:bg-slate-50 active:bg-slate-100 text-slate-700 focus-visible:outline-indigo-600',
-      danger: 'bg-red-600 hover:bg-red-500 active:bg-red-700 text-white shadow-sm focus-visible:outline-red-600',
-      ghost: 'hover:bg-slate-100 active:bg-slate-200 text-slate-600 focus-visible:outline-indigo-600',
+      primary:
+        'bg-stone-900 hover:bg-stone-700 active:bg-stone-950 text-white shadow-card focus-visible:outline-stone-900',
+      secondary:
+        'bg-white ring-1 ring-inset ring-stone-300 hover:bg-stone-50 active:bg-stone-100 text-stone-700 focus-visible:outline-stone-900',
+      danger:
+        'bg-red-600 hover:bg-red-500 active:bg-red-700 text-white shadow-card focus-visible:outline-red-600',
+      ghost:
+        'hover:bg-stone-100 active:bg-stone-200 text-stone-600 focus-visible:outline-stone-900',
     }
 
     const sizeClasses: Record<ButtonSize, string> = {
-      sm: 'px-2.5 py-1.5 text-xs rounded-md gap-1.5',
-      md: 'px-3.5 py-2 text-sm rounded-lg gap-2',
-      lg: 'px-4 py-2.5 text-sm rounded-lg gap-2',
+      sm: 'h-8 px-3 text-xs rounded-md gap-1.5',
+      md: 'h-10 px-4 text-sm rounded-lg gap-2',
+      lg: 'h-12 px-5 text-[15px] rounded-lg gap-2',
     }
 
     return (

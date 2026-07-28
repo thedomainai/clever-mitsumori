@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,11 +6,26 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    @apply bg-canvas text-stone-900 antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'palt';
   }
 
   ::selection {
-    @apply bg-indigo-100 text-indigo-900;
+    @apply bg-stone-900 text-white;
+  }
+
+  /* Thin scrollbars for wide tables */
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-stone-200 rounded-full;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-stone-300;
   }
 }

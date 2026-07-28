@@ -4,6 +4,9 @@ import type { SearchResult, ProductOverride } from '@/lib/types'
 import { PRICE_CONFIG } from '@/lib/constants'
 import { TableRow, TableCell } from '@/components/ui/table'
 import EditableCell from '@/components/ui/editable-cell'
+import Badge from '@/components/ui/badge'
+import { getStockStatus, STOCK_STATUS_LABEL } from '@/lib/constants/stock-status'
+import { getMaterialProperties } from '@/lib/constants/material-properties'
 
 export interface ResultsRowProps {
   result: SearchResult
@@ -31,14 +34,21 @@ function formatPercent(rate: number | undefined | null): string {
 export default function ResultsRow({ result, override, onSaveOverride, canEdit }: ResultsRowProps) {
   const { product, calculatedPrice } = result
   const ecHinban = product.ec_hinban
+  const stockStatus = getStockStatus(product)
+  const materialProps = getMaterialProperties(product.zaishitsu)
+  const materialTitle = materialProps
+    ? `${materialProps.label} / 使用温度 ${materialProps.heatMinC ?? '?'}〜${materialProps.heatMaxC ?? '?'}℃ / 耐酸性${materialProps.acid} 耐アルカリ性${materialProps.alkali} 耐溶剤性${materialProps.solvent}`
+    : undefined
 
   return (
     <TableRow>
-      <TableCell className="font-medium text-slate-900 text-xs max-w-[180px] truncate">
+      <TableCell stickyLeft className="font-medium text-stone-900 text-xs max-w-[180px] truncate">
         {product.ec_hinban}
       </TableCell>
       <TableCell className="text-xs">{product.hinban ?? '-'}</TableCell>
-      <TableCell>{product.zaishitsu ?? '-'}</TableCell>
+      <TableCell title={materialTitle} className={materialTitle ? 'cursor-help decoration-dotted underline underline-offset-2' : undefined}>
+        {product.zaishitsu ?? '-'}
+      </TableCell>
       <TableCell className="text-right tabular-nums">
         {product.meopen_um != null ? `${product.meopen_um}` : '-'}
       </TableCell>
@@ -53,6 +63,22 @@ export default function ResultsRow({ result, override, onSaveOverride, canEdit }
       </TableCell>
       <TableCell className="text-right tabular-nums">
         {product.zaiko_haba_mm != null ? `${product.zaiko_haba_mm}` : '-'}
+      </TableCell>
+      <TableCell className="text-right tabular-nums">
+        {stockStatus === 'in_stock' ? (
+          <span className="inline-flex items-center gap-1.5 justify-end">
+            <span className="tabular-nums text-stone-700">{product.nokori_m}m</span>
+            <Badge color="green">在庫</Badge>
+          </span>
+        ) : stockStatus === 'direct_ship' ? (
+          <span title={STOCK_STATUS_LABEL.direct_ship} className="cursor-help">
+            <Badge color="yellow">直送品</Badge>
+          </span>
+        ) : (
+          <span title={STOCK_STATUS_LABEL.unmatched} className="cursor-help">
+            <Badge color="gray">品番未整備</Badge>
+          </span>
+        )}
       </TableCell>
       <TableCell className="text-xs max-w-[120px] truncate">{product.size ?? '-'}</TableCell>
       <TableCell>{product.color ?? '-'}</TableCell>
@@ -79,12 +105,12 @@ export default function ResultsRow({ result, override, onSaveOverride, canEdit }
         editScale={100}
         readOnly={!canEdit}
       />
-      <TableCell className="text-right tabular-nums font-medium">
+      <TableCell className="text-right tabular-nums font-semibold text-stone-900">
         {formatPrice(calculatedPrice)}
       </TableCell>
-      <TableCell className="text-right tabular-nums">{formatPrice(product.rakuten_price)}</TableCell>
-      <TableCell className="text-right tabular-nums">{formatPrice(product.yahoo_price)}</TableCell>
-      <TableCell className="text-right tabular-nums">{formatPrice(product.amazon_price)}</TableCell>
+      <TableCell className="text-right tabular-nums text-stone-500">{formatPrice(product.rakuten_price)}</TableCell>
+      <TableCell className="text-right tabular-nums text-stone-500">{formatPrice(product.yahoo_price)}</TableCell>
+      <TableCell className="text-right tabular-nums text-stone-500">{formatPrice(product.amazon_price)}</TableCell>
     </TableRow>
   )
 }

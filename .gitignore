@@ -64,3 +64,4 @@ tsconfig.tsbuildinfo
 # Misc
 *.log
 npm-debug.log*
+.vercel

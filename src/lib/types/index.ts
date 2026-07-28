@@ -76,11 +76,21 @@ export type SearchFilter = {
   ec_hinban?: string
   color?: string
   freeText?: string
+  /** 在庫状況（未指定 = 全件） */
+  stockStatus?: 'in_stock' | 'direct_ship'
+  /** 使用上限温度がこの値以上の素材のみ（特性データのある素材が対象） */
+  heatMaxC_min?: number
+  /** 耐酸性が◎の素材のみ */
+  acidResistantOnly?: boolean
+  /** 耐アルカリ性が◎の素材のみ */
+  alkaliResistantOnly?: boolean
+  /** 耐溶剤性が◎の素材のみ */
+  solventResistantOnly?: boolean
 }
 
 // Sort
 export type Sort = {
-  field: 'hinban' | 'meopen_um' | 'mesh_count' | 'senkei_um' | 'kaikouritsu' | 'zaiko_haba_mm' | 'shiire_per_m' | 'hanbai_kakaku' | 'ec_hinban' | 'zaishitsu'
+  field: 'hinban' | 'meopen_um' | 'mesh_count' | 'senkei_um' | 'kaikouritsu' | 'zaiko_haba_mm' | 'nokori_m' | 'shiire_per_m' | 'hanbai_kakaku' | 'ec_hinban' | 'zaishitsu'
   order: 'asc' | 'desc'
 }
 

@@ -77,16 +77,16 @@ export default function EditableCell({
     return (
       <td
         className={`
-          px-4 py-3 text-right tabular-nums text-sm
-          ${isOverridden ? 'text-slate-700 font-medium' : 'text-slate-500'}
+          px-4 py-2.5 text-right tabular-nums text-sm whitespace-nowrap
+          ${isOverridden ? 'text-stone-700 font-medium' : 'text-stone-500'}
           ${className}
         `}
         title="編集は無効です（保存先が未設定のため）"
       >
-        <span className="inline-flex items-center gap-1">
+        <span className="inline-flex items-center gap-1.5">
           {format(value)}
           {isOverridden && (
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-stone-400 flex-shrink-0" />
           )}
         </span>
       </td>
@@ -95,8 +95,8 @@ export default function EditableCell({
 
   if (editing) {
     return (
-      <td className={`px-4 py-3 text-right ${className}`}>
-        <div className="flex items-center justify-end gap-0.5">
+      <td className={`px-4 py-1.5 text-right whitespace-nowrap ${className}`}>
+        <div className="flex items-center justify-end gap-1">
           <input
             ref={inputRef}
             type="number"
@@ -105,10 +105,10 @@ export default function EditableCell({
             onChange={(e) => setDraft(e.target.value)}
             onBlur={commit}
             onKeyDown={handleKeyDown}
-            className="w-20 px-1.5 py-0.5 text-right text-sm tabular-nums border border-slate-300 rounded bg-white focus:outline-none focus:ring-1 focus:ring-slate-400"
+            className="w-24 h-8 px-2 text-right text-sm tabular-nums border border-stone-400 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500"
           />
           {inputSuffix && (
-            <span className="text-xs text-slate-400">{inputSuffix}</span>
+            <span className="text-xs text-stone-400">{inputSuffix}</span>
           )}
         </div>
       </td>
@@ -119,14 +119,21 @@ export default function EditableCell({
     <td
       onClick={startEdit}
       className={`
-        px-4 py-3 text-right tabular-nums text-sm cursor-pointer
-        hover:bg-slate-50 transition-colors
-        ${isOverridden ? 'text-blue-700 font-medium' : 'text-slate-600'}
+        group/cell px-4 py-2.5 text-right tabular-nums text-sm whitespace-nowrap cursor-pointer
+        hover:bg-stone-100/80 transition-colors
+        ${isOverridden ? 'text-blue-700 font-medium' : 'text-stone-600'}
         ${className}
       `}
       title={isOverridden ? '編集済み（クリックで変更）' : 'クリックで編集'}
     >
-      <span className="inline-flex items-center gap-1">
+      <span
+        className={`
+          inline-flex items-center gap-1.5
+          underline decoration-dotted underline-offset-4
+          ${isOverridden ? 'decoration-blue-300' : 'decoration-stone-300 group-hover/cell:decoration-stone-500'}
+          transition-colors
+        `}
+      >
         {format(value)}
         {isOverridden && (
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
