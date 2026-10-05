@@ -1,0 +1,32 @@
+rules_version = '2';
+
+// clever（EC 価格管理）の Firestore セキュリティルール
+// プロジェクト cyreco-management-dashboard は経営ダッシュボードと共用のため、
+// clever 専用の Identity Platform テナントでログインしたユーザーだけを通す。
+//
+// 利用者の登録は許可リストで行う（Firebase コンソールで管理者がドキュメントを作る）
+//   clever_allowed_users/{メールアドレス（小文字）}   … 個人単位で許可
+//   clever_allowed_domains/{ドメイン（小文字）}       … ドメイン単位で許可（例: 社用ドメイン）
+// 許可リスト自体はクライアントから読み書きできない。
+//
+// 反映: firebaserules API で ruleset を作成し、releases/cloud.firestore を更新する
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isCleverUser() {
+      let email = request.auth.token.email.lower();
+      return request.auth != null
+        && request.auth.token.firebase.tenant == 'clever-c8e59'
+        && request.auth.token.email_verified == true
+        && (exists(/databases/$(database)/documents/clever_allowed_users/$(email))
+          || exists(/databases/$(database)/documents/clever_allowed_domains/$(email.split('@')[1])));
+    }
+
+    match /product_overrides/{document=**} {
+      allow read, write: if isCleverUser();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

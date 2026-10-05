@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { AuthGate, AuthProvider, UserMenu } from '@/components/features/auth/auth-gate'
 import './globals.css'
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="description" content="材質・目開きで商品を検索し、EC販売価格を確認・管理できるツール" />
       </head>
       <body className="bg-canvas antialiased">
+        <AuthProvider>
         <div className="min-h-screen flex flex-col">
           <header className="sticky top-0 z-40 bg-canvas/90 backdrop-blur-md border-b border-stone-200/70">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
@@ -52,13 +54,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     {item.label}
                   </Link>
                 ))}
+                <UserMenu />
               </nav>
             </div>
           </header>
 
           <main className="flex-1">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
-              {children}
+              <AuthGate>{children}</AuthGate>
             </div>
           </main>
 
@@ -68,6 +71,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
           </footer>
         </div>
+        </AuthProvider>
       </body>
     </html>
   )

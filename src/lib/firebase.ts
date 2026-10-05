@@ -1,5 +1,6 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app'
 import { getFirestore, type Firestore } from 'firebase/firestore'
+import { getAuth, type Auth } from 'firebase/auth'
 
 const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? ''
 
@@ -7,6 +8,7 @@ export const isFirebaseConfigured = projectId !== ''
 
 let app: FirebaseApp | null = null
 let db: Firestore | null = null
+let auth: Auth | null = null
 
 if (isFirebaseConfigured) {
   app = getApps().length === 0
@@ -20,6 +22,9 @@ if (isFirebaseConfigured) {
       })
     : getApps()[0]
   db = getFirestore(app)
+  auth = getAuth(app)
+  // 経営ダッシュボードと同じ GCP プロジェクトのため、clever 専用テナントでユーザーを分離する
+  auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_TENANT_ID || null
 }
 
-export { db }
+export { db, auth }
