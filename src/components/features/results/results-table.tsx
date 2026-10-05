@@ -20,6 +20,9 @@ export interface ResultsTableProps {
   onSaveOverride: (ecHinban: string, fields: Partial<Omit<ProductOverride, 'updated_at'>>) => void
   /** When false, the editable columns render as plain text */
   canEdit: boolean
+  onFindSimilar?: (product: SearchResult['product']) => void
+  /** 近い商品の候補件数（0 件時の案内に使う） */
+  similarCount?: number
 }
 
 interface HeaderDef {
@@ -64,6 +67,8 @@ export default function ResultsTable({
   overrides,
   onSaveOverride,
   canEdit,
+  onFindSimilar,
+  similarCount,
 }: ResultsTableProps) {
   if (results.length === 0) {
     return (
@@ -77,7 +82,9 @@ export default function ResultsTable({
             </div>
             <p className="text-sm font-medium text-stone-900">条件に一致する商品が見つかりませんでした</p>
             <p className="mt-1.5 text-sm text-stone-500 leading-relaxed">
-              条件を減らすか、目開きの範囲を広げて再検索してみてください
+              {similarCount
+                ? `下の「近い商品」に、条件に近い商品が ${similarCount.toLocaleString()} 件あります`
+                : '条件を減らすか、目開きの範囲を広げて再検索してみてください'}
             </p>
           </div>
         </div>
@@ -133,6 +140,7 @@ export default function ResultsTable({
               override={overrides.get(result.product.ec_hinban)}
               onSaveOverride={onSaveOverride}
               canEdit={canEdit}
+              onFindSimilar={onFindSimilar}
             />
           ))}
         </Table>

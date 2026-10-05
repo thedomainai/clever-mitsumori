@@ -106,6 +106,8 @@ export function useSearch(products: UnifiedProduct[], overrides: OverrideMap) {
   )
 
   return {
+    /** Firestore のオーバーライドを合成済みの全商品 */
+    merged,
     results,
     pagination,
     sortColumn,

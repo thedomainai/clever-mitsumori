@@ -14,6 +14,8 @@ export interface ResultsRowProps {
   onSaveOverride: (ecHinban: string, fields: Partial<Omit<ProductOverride, 'updated_at'>>) => void
   /** When false, the editable columns render as plain text */
   canEdit: boolean
+  /** 「近い商品」ボタンの押下（未指定ならボタンを出さない） */
+  onFindSimilar?: (product: SearchResult['product']) => void
 }
 
 function formatPrice(price: number | undefined | null): string {
@@ -31,7 +33,7 @@ function formatPercent(rate: number | undefined | null): string {
   return `${(rate * 100).toFixed(0)}%`
 }
 
-export default function ResultsRow({ result, override, onSaveOverride, canEdit }: ResultsRowProps) {
+export default function ResultsRow({ result, override, onSaveOverride, canEdit, onFindSimilar }: ResultsRowProps) {
   const { product, calculatedPrice } = result
   const ecHinban = product.ec_hinban
   const stockStatus = getStockStatus(product)
@@ -42,8 +44,20 @@ export default function ResultsRow({ result, override, onSaveOverride, canEdit }
 
   return (
     <TableRow>
-      <TableCell stickyLeft className="font-medium text-stone-900 text-xs max-w-[180px] truncate">
-        {product.ec_hinban}
+      <TableCell stickyLeft className="font-medium text-stone-900 text-xs max-w-[220px]">
+        <span className="flex items-center justify-between gap-2">
+          <span className="truncate">{product.ec_hinban}</span>
+          {onFindSimilar && (product.meopen_um != null || product.mesh_count != null) && (
+            <button
+              type="button"
+              onClick={() => onFindSimilar(product)}
+              className="flex-shrink-0 h-6 px-2 rounded-md text-[11px] font-medium text-stone-500 ring-1 ring-inset ring-stone-300 hover:bg-stone-100 hover:text-stone-900 transition-colors"
+              title="この商品に近い商品を探す"
+            >
+              近い商品
+            </button>
+          )}
+        </span>
       </TableCell>
       <TableCell className="text-xs">{product.hinban ?? '-'}</TableCell>
       <TableCell title={materialTitle} className={materialTitle ? 'cursor-help decoration-dotted underline underline-offset-2' : undefined}>

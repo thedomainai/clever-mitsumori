@@ -1,15 +1,33 @@
 'use client'
 
-import { Suspense, useEffect, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import SearchForm from '@/components/features/search/search-form'
 import ResultsTable from '@/components/features/results/results-table'
+import SimilarPanel from '@/components/features/similar/similar-panel'
+import { findSimilarProducts, targetFromProduct, type SimilarTarget } from '@/lib/services/similar-products'
 import { useInventory } from '@/hooks/use-inventory'
 import { useProductOverrides } from '@/hooks/use-product-overrides'
 import { useSearch } from '@/hooks/use-search'
-import type { SearchFilter } from '@/lib/types'
+import type { SearchFilter, UnifiedProduct } from '@/lib/types'
 import LoadingSpinner from '@/components/ui/loading-spinner'
 import { isFirebaseConfigured } from '@/lib/firebase'
+
+/** 検索条件から「近い商品」の基準を作る。サイズ（目開きかメッシュ数）が無ければ null */
+function targetFromFilters(f: SearchFilter): SimilarTarget | null {
+  const mid = (min?: number, max?: number) =>
+    min != null && max != null ? (min + max) / 2 : (min ?? max)
+  const meopen = mid(f.meopen_um_min, f.meopen_um_max)
+  const mesh = mid(f.mesh_count_min, f.mesh_count_max)
+  if (meopen == null && mesh == null) return null
+  return {
+    materials: f.zaishitsu_list ?? (f.zaishitsu ? [f.zaishitsu] : []),
+    meopen_um: meopen,
+    mesh_count: meopen == null ? mesh : undefined,
+    minWidthMm: f.zaiko_haba_mm_min,
+    heatMinC: f.heatMaxC_min,
+  }
+}
 
 const CATEGORIES = [
   { key: 'mesh', label: 'メッシュ', active: true },
@@ -33,8 +51,24 @@ function SearchPageInner() {
 
   const { products, isLoading: baseLoading, error: baseError } = useInventory()
   const { overrides, isLoading: ovLoading, error: ovError, saveOverride } = useProductOverrides()
-  const { results, pagination, sortColumn, sortDirection, search, onSort, onPageChange } =
+  const { merged, results, pagination, sortColumn, sortDirection, search, onSort, onPageChange } =
     useSearch(products, overrides)
+  const [lastFilters, setLastFilters] = useState<SearchFilter>(initialFilters)
+  const [baseProduct, setBaseProduct] = useState<UnifiedProduct | null>(null)
+  const similarRef = useRef<HTMLDivElement>(null)
+
+  const similarTarget = baseProduct ? targetFromProduct(baseProduct) : targetFromFilters(lastFilters)
+  const similarBaseLabel = baseProduct ? `EC品番 ${baseProduct.ec_hinban}` : '検索条件'
+  const similarCount = useMemo(
+    () => (similarTarget && results.length === 0 ? findSimilarProducts(merged, similarTarget).total : 0),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [merged, JSON.stringify(similarTarget), results.length],
+  )
+
+  const handleFindSimilar = (product: UnifiedProduct) => {
+    setBaseProduct(product)
+    requestAnimationFrame(() => similarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+  }
 
   // Apply URL-provided filters once the data is ready
   const appliedInitial = useRef(false)
@@ -59,6 +93,8 @@ function SearchPageInner() {
   }, [products])
 
   const handleSearch = (filters: SearchFilter) => {
+    setLastFilters(filters)
+    setBaseProduct(null)
     search(filters)
   }
 
@@ -146,6 +182,22 @@ function SearchPageInner() {
           onSort={onSort}
           sortColumn={sortColumn}
           sortDirection={sortDirection}
+          overrides={overrides}
+          onSaveOverride={saveOverride}
+          canEdit={isFirebaseConfigured}
+          onFindSimilar={handleFindSimilar}
+          similarCount={similarCount}
+        />
+      )}
+
+      {!isLoading && !error && similarTarget && (
+        <SimilarPanel
+          key={similarBaseLabel + JSON.stringify(similarTarget)}
+          ref={similarRef}
+          products={merged}
+          target={similarTarget}
+          baseLabel={similarBaseLabel}
+          onClearBase={baseProduct ? () => setBaseProduct(null) : undefined}
           overrides={overrides}
           onSaveOverride={saveOverride}
           canEdit={isFirebaseConfigured}
