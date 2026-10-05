@@ -67,6 +67,10 @@ COLUMNS = [
     ("zaiko_match", to_str),
     ("zaiko_status", to_str),
     ("spec_source", to_str),
+    ("mesh_count_yoko", to_num),
+    ("meopen_yoko_um", to_num),
+    ("senkei_yoko_um", to_num),
+    ("roka_ryudo_um", to_num),
 ]
 
 

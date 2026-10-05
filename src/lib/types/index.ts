@@ -53,6 +53,13 @@ export type UnifiedProduct = {
   zaiko_status?: string
   /** 仕様（目開き・メッシュ数・線径）の出どころ: 在庫表 / Amazon商品名 / 品番 */
   spec_source?: string
+  /** 横のメッシュ数・目開き・線径。スラッシュ表記「635/4300」の 2 つ目（縦/横であり下限/上限ではない）。
+   *  空なら縦と同じか不明。縦の値は mesh_count / meopen_um / senkei_um */
+  mesh_count_yoko?: number
+  meopen_yoko_um?: number
+  senkei_yoko_um?: number
+  /** 濾過粒度 μm（畳織。商品名の「粒球子」） */
+  roka_ryudo_um?: number
 }
 
 // User-editable overrides stored in Firestore

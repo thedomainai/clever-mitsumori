@@ -361,7 +361,9 @@ def main():
         row = dict(zip(cols, values))
         title = titles.get(norm(row["amazon_sku"])) or titles.get(norm(row["ec_hinban"])) or ""
         enriched.append(enrich_specs(row, title))
-    out_cols = cols + ["spec_source"]
+    # 横の値（縦と異なる場合のみ。スラッシュ表記の 2 つ目）と畳織の濾過粒度
+    out_cols = cols + ["spec_source", "mesh_count_yoko", "meopen_yoko_um",
+                       "senkei_yoko_um", "roka_ryudo_um"]
     with open(out, "w", newline="", encoding="utf-8-sig") as fp:
         w = csv.writer(fp)
         w.writerow(out_cols)
