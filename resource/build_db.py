@@ -31,6 +31,16 @@ def norm(code):
     return c if c else None
 
 
+def hinban_key(hinban):
+    """品番の照合キー。大文字化・前後空白除去に加え、数値末尾の「.0」を落とす
+    （在庫表「φ5.0mm」と EC「φ5mm」を同じ品番として扱う）。"""
+    if hinban is None:
+        return None
+    h = str(hinban).strip().upper()
+    h = re.sub(r"(\d+)\.0+(?!\d)", r"\1", h)
+    return h or None
+
+
 def zaiko_key_to_code(key):
     """clever-N-2-1000-1-BL -> clv-n-2-1000-1 （末尾の色コードを除去）"""
     k = norm(key)
@@ -193,6 +203,13 @@ def main():
         add_zaiko("torikaru", r[0], r[1], None, r[2], r[3], r[4], r[5],
                   None, r[7], r[8], r[9], r[11])  # 仕入値（ｍ）を採用
 
+    # ---- 品番の照合キー（hinban_key）を products・zaiko に保存 ----
+    for table in ("products", "zaiko"):
+        cur.execute(f"ALTER TABLE {table} ADD COLUMN hinban_n TEXT")
+        for rowid, h in cur.execute(f"SELECT rowid, hinban FROM {table}").fetchall():
+            cur.execute(f"UPDATE {table} SET hinban_n=? WHERE rowid=?",
+                        (hinban_key(h), rowid))
+
     # ---- products に幅(mm)・カット長(m) を付与（サイズ "1400mm*1ｍ" から抽出） ----
     # サイズ欄が空欄の行はシステム下段カラム（同形式）をフォールバックに使う。
     # 「50ｍ」のような長さのみの表記は cut_m だけ取り、幅は取らない。
@@ -227,12 +244,12 @@ def main():
     # ---- 統合ビュー ----
     # 仕入値の照合は2段階: (1)共通キー一致 (2)品番+幅一致
     cur.execute("""CREATE VIEW zaiko_agg AS
-        SELECT key, UPPER(TRIM(hinban)) AS hinban_u, haba_mm,
+        SELECT key, hinban_n AS hinban_u, haba_mm,
                MAX(shiire_per_m) AS shiire_per_m,
                SUM(nokori_m) AS nokori_m, MIN(source) AS source,
                MAX(meopen_um) AS meopen_um,
                MAX(mesh_count) AS mesh_count
-        FROM zaiko GROUP BY key, UPPER(TRIM(hinban)), haba_mm""")
+        FROM zaiko GROUP BY key, hinban_n, haba_mm""")
     cur.execute(f"""CREATE VIEW unified AS
         SELECT
             COALESCE(p.yahoo_code, p.amazon_sku, p.rakuten_code) AS ec_hinban,
@@ -280,7 +297,7 @@ def main():
                      OR zs.hinban_u IS NOT NULL THEN '突合OK'
                 WHEN p.hinban IS NULL OR TRIM(p.hinban) = '' THEN '品番空欄'
                 WHEN EXISTS(SELECT 1 FROM zaiko z3
-                            WHERE UPPER(TRIM(z3.hinban)) = UPPER(TRIM(p.hinban)))
+                            WHERE z3.hinban_n = p.hinban_n)
                 THEN CASE WHEN p.haba_mm IS NULL
                           THEN '幅不一致(マスタにサイズ情報なし)'
                           ELSE '幅不一致' END
@@ -298,22 +315,22 @@ def main():
                           MAX(CAST(haba_mm AS REAL)) AS zaiko_haba_mm
                    FROM zaiko WHERE key IS NOT NULL GROUP BY key
         ) zk ON zk.key = p.rakuten_key
-        LEFT JOIN (SELECT UPPER(TRIM(hinban)) AS hinban_u, haba_mm,
+        LEFT JOIN (SELECT hinban_n AS hinban_u, haba_mm,
                           MAX(shiire_per_m) AS shiire_per_m,
                           SUM(nokori_m) AS nokori_m, MIN(source) AS source,
                           MAX(meopen_um) AS meopen_um,
                           MAX(mesh_count) AS mesh_count
                    FROM zaiko WHERE hinban IS NOT NULL GROUP BY 1, 2
-        ) zh ON zh.hinban_u = UPPER(TRIM(p.hinban))
+        ) zh ON zh.hinban_u = p.hinban_n
             AND zh.haba_mm = p.haba_mm AND zk.key IS NULL
-        LEFT JOIN (SELECT UPPER(TRIM(hinban)) AS hinban_u,
+        LEFT JOIN (SELECT hinban_n AS hinban_u,
                           MAX(shiire_per_m) AS shiire_per_m,
                           SUM(nokori_m) AS nokori_m, MIN(source) AS source,
                           MAX(meopen_um) AS meopen_um,
                           MAX(mesh_count) AS mesh_count,
                           MAX(CAST(haba_mm AS REAL)) AS zaiko_haba_mm
                    FROM zaiko WHERE hinban IS NOT NULL GROUP BY 1
-        ) zs ON zs.hinban_u = UPPER(TRIM(p.hinban))
+        ) zs ON zs.hinban_u = p.hinban_n
             AND zk.key IS NULL AND zh.hinban_u IS NULL""")
 
     con.commit()
