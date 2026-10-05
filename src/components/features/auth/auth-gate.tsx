@@ -112,7 +112,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const { user, status, signIn, signInWithEmail, sendPasswordSetup, logout } = useAuth()
   const [signingIn, setSigningIn] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [notice, setNotice] = useState<string | null>(null)
+  // login: ログイン / setup: 初めての方・パスワード再設定 / sent: 設定メール送信済み
+  const [mode, setMode] = useState<'login' | 'setup' | 'sent'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -142,7 +143,6 @@ export function AuthGate({ children }: { children: ReactNode }) {
     e.preventDefault()
     setSigningIn(true)
     setError(null)
-    setNotice(null)
     try {
       await signInWithEmail(email.trim(), password)
     } catch (e) {
@@ -160,20 +160,24 @@ export function AuthGate({ children }: { children: ReactNode }) {
     }
   }
 
-  const handlePasswordSetup = async () => {
+  const handlePasswordSetup = async (e: FormEvent) => {
+    e.preventDefault()
+    setSigningIn(true)
     setError(null)
-    setNotice(null)
-    if (!email.trim()) {
-      setError('メールアドレスを入力してから押してください')
-      return
-    }
     try {
       await sendPasswordSetup(email.trim())
     } catch (e) {
       // 登録の有無を外部に漏らさないよう、失敗しても同じ案内を出す
       console.error('パスワード設定メールの送信に失敗しました:', e)
+    } finally {
+      setSigningIn(false)
     }
-    setNotice('登録済みのメールアドレスであれば、パスワード設定用のメールを送信しました')
+    setMode('sent')
+  }
+
+  const goTo = (next: 'login' | 'setup') => {
+    setError(null)
+    setMode(next)
   }
 
   return (
@@ -191,42 +195,110 @@ export function AuthGate({ children }: { children: ReactNode }) {
         </>
       ) : (
         <>
-          <h1 className="text-lg font-semibold text-stone-900">ログイン</h1>
-          <form onSubmit={handleEmailSignIn} className="mt-6 space-y-3 text-left">
-            <Input
-              label="メールアドレス"
-              type="email"
-              autoComplete="username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <Input
-              label="パスワード"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <Button type="submit" className="w-full" loading={signingIn}>
-              ログイン
-            </Button>
-          </form>
-          <button
-            type="button"
-            onClick={handlePasswordSetup}
-            className="mt-3 text-xs text-stone-500 underline underline-offset-2 hover:text-stone-900"
-          >
-            初めての方・パスワードを忘れた方（設定用メールを送信）
-          </button>
-          {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-          {notice && <p className="mt-4 text-sm text-stone-600">{notice}</p>}
-          <div className="mt-8 pt-6 border-t border-stone-200">
-            <Button variant="secondary" className="w-full" disabled={signingIn} onClick={handleSignIn}>
-              Google アカウントでログイン
-            </Button>
-          </div>
+          {mode === 'login' && (
+            <>
+              <h1 className="text-lg font-semibold text-stone-900">ログイン</h1>
+              <form onSubmit={handleEmailSignIn} className="mt-6 space-y-3 text-left">
+                <Input
+                  label="メールアドレス"
+                  type="email"
+                  autoComplete="username"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <Input
+                  label="パスワード"
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Button type="submit" className="w-full" loading={signingIn}>
+                  ログイン
+                </Button>
+              </form>
+              {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+              <button
+                type="button"
+                onClick={() => goTo('setup')}
+                className="mt-3 text-xs text-stone-500 underline underline-offset-2 hover:text-stone-900"
+              >
+                パスワードを忘れた方はこちら
+              </button>
+              <div className="mt-8 rounded-lg border border-stone-200 bg-stone-50 p-4 text-left">
+                <p className="text-sm font-medium text-stone-900">初めてご利用の方</p>
+                <p className="mt-1 text-xs text-stone-500 leading-relaxed">
+                  ご自身でパスワードを決める必要があります。登録済みのメールアドレスに設定用のメールをお送りします。
+                </p>
+                <Button variant="secondary" className="mt-3 w-full" onClick={() => goTo('setup')}>
+                  初めての方はこちら（パスワードを設定する）
+                </Button>
+              </div>
+              <div className="mt-6 pt-6 border-t border-stone-200">
+                <Button variant="secondary" className="w-full" disabled={signingIn} onClick={handleSignIn}>
+                  Google アカウントでログイン
+                </Button>
+              </div>
+            </>
+          )}
+
+          {mode === 'setup' && (
+            <>
+              <h1 className="text-lg font-semibold text-stone-900">パスワードの設定</h1>
+              <ol className="mt-4 space-y-1 text-left text-sm text-stone-600 leading-relaxed list-decimal list-inside">
+                <li>登録したメールアドレスを入力して送信する</li>
+                <li>届いたメールのリンクを開く</li>
+                <li>好きなパスワードを決める</li>
+                <li>このページに戻り、ログインする</li>
+              </ol>
+              <form onSubmit={handlePasswordSetup} className="mt-6 space-y-3 text-left">
+                <Input
+                  label="メールアドレス"
+                  type="email"
+                  autoComplete="username"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <Button type="submit" className="w-full" loading={signingIn}>
+                  設定用のメールを送る
+                </Button>
+              </form>
+              <button
+                type="button"
+                onClick={() => goTo('login')}
+                className="mt-3 text-xs text-stone-500 underline underline-offset-2 hover:text-stone-900"
+              >
+                ログイン画面に戻る
+              </button>
+            </>
+          )}
+
+          {mode === 'sent' && (
+            <>
+              <h1 className="text-lg font-semibold text-stone-900">メールを確認してください</h1>
+              <p className="mt-3 text-sm text-stone-600 leading-relaxed">
+                {email.trim()} が登録済みであれば、パスワード設定用のメールをお送りしました。
+                メール内のリンクからパスワードを決めたあと、このページでログインしてください。
+              </p>
+              <p className="mt-3 text-xs text-stone-500 leading-relaxed">
+                数分待っても届かない場合は、迷惑メールのフォルダをご確認ください。
+                それでも届かない場合は、メールアドレスが登録されていない可能性があります。管理者にご連絡ください。
+              </p>
+              <Button className="mt-6 w-full" onClick={() => goTo('login')}>
+                ログイン画面に進む
+              </Button>
+              <button
+                type="button"
+                onClick={() => goTo('setup')}
+                className="mt-3 text-xs text-stone-500 underline underline-offset-2 hover:text-stone-900"
+              >
+                メールアドレスを入力し直す
+              </button>
+            </>
+          )}
         </>
       )}
     </div>
