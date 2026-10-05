@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { UnifiedProduct } from '@/lib/types'
+import { auth } from '@/lib/firebase'
 
 export function useInventory() {
   const [products, setProducts] = useState<UnifiedProduct[]>([])
@@ -13,7 +14,11 @@ export function useInventory() {
 
     async function load() {
       try {
-        const res = await fetch('/data/unified.json')
+        // 商品データは仕入値を含むため、ログイン中の利用者の ID トークンを付けて API から取得する
+        const token = await auth?.currentUser?.getIdToken()
+        const res = await fetch('/api/products', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const data: UnifiedProduct[] = await res.json()
         if (!cancelled) {
