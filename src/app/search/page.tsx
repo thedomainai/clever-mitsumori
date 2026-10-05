@@ -46,14 +46,16 @@ function SearchPageInner() {
   }, [products, initialFilters, search])
 
   const materialOptions = useMemo(() => {
-    const counts = new Map<string, number>()
+    // 表記ゆれ（半角/全角カナ等）は正規化キーで束ね、最初に現れた表記を代表として表示する
+    const map = new Map<string, { value: string; count: number }>()
     for (const p of products) {
-      if (p.zaishitsu) counts.set(p.zaishitsu, (counts.get(p.zaishitsu) ?? 0) + 1)
+      if (!p.zaishitsu) continue
+      const key = p.zaishitsu.toLowerCase().replace(/[　\s]/g, '').normalize('NFKC')
+      const entry = map.get(key)
+      if (entry) entry.count += 1
+      else map.set(key, { value: p.zaishitsu, count: 1 })
     }
-    return Array.from(counts.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 20)
-      .map(([name]) => name)
+    return Array.from(map.values()).sort((a, b) => b.count - a.count)
   }, [products])
 
   const handleSearch = (filters: SearchFilter) => {

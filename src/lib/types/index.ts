@@ -62,6 +62,8 @@ export type ProductOverride = {
 // Search filter
 export type SearchFilter = {
   zaishitsu?: string
+  /** 材質の複数選択（OR）。正規化した完全一致で照合する */
+  zaishitsu_list?: string[]
   meopen_um_min?: number
   meopen_um_max?: number
   mesh_count_min?: number

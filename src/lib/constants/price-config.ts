@@ -7,4 +7,6 @@ export const PRICE_CONFIG = {
 
 export const SEARCH_CONFIG = {
   defaultPageSize: 100,
+  // 目開きは中心値 1 つの入力から ±10% の範囲を自動検索する（例: 200 → 180〜220）（7/28 決定）
+  meopenTolerance: 0.1,
 } as const

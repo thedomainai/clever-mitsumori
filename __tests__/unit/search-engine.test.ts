@@ -34,6 +34,31 @@ describe('searchProducts', () => {
     expect(result.data.results.every(r => r.product.zaishitsu === 'SUS304')).toBe(true)
   })
 
+  it('should filter by zaishitsu_list with OR across selections', () => {
+    const filter: SearchFilter = { zaishitsu_list: ['SUS316', 'ポリプロ'] }
+    const result = searchProducts(products, filter)
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    expect(result.data.results.map(r => r.product.ec_hinban)).toEqual(['EC-002', 'EC-004'])
+  })
+
+  it('should match zaishitsu_list by normalized exact equality (case-insensitive)', () => {
+    const filter: SearchFilter = { zaishitsu_list: ['sus316'] }
+    const result = searchProducts(products, filter)
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    expect(result.data.results).toHaveLength(1)
+    expect(result.data.results[0].product.ec_hinban).toBe('EC-002')
+  })
+
+  it('should not partial-match via zaishitsu_list (SUS must not hit SUS304/SUS316)', () => {
+    const filter: SearchFilter = { zaishitsu_list: ['SUS'] }
+    const result = searchProducts(products, filter)
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    expect(result.data.results).toHaveLength(0)
+  })
+
   it('should filter by meopen_um range', () => {
     const filter: SearchFilter = { meopen_um_min: 100, meopen_um_max: 400 }
     const result = searchProducts(products, filter)

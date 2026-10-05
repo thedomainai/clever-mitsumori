@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useInventory } from '@/hooks/use-inventory'
 import Button from '@/components/ui/button'
-import RangeField from '@/components/ui/range-field'
+import { SEARCH_CONFIG } from '@/lib/constants'
 
 function StatBlock({
   label,
@@ -57,8 +57,7 @@ export default function Home() {
   const router = useRouter()
 
   const [zaishitsu, setZaishitsu] = useState('')
-  const [meopenMin, setMeopenMin] = useState('')
-  const [meopenMax, setMeopenMax] = useState('')
+  const [meopenCenter, setMeopenCenter] = useState('')
 
   const materialOptions = useMemo(() => {
     const counts = new Map<string, number>()
@@ -74,8 +73,12 @@ export default function Home() {
   const handleQuickSearch = () => {
     const params = new URLSearchParams()
     if (zaishitsu.trim()) params.set('zaishitsu', zaishitsu.trim())
-    if (meopenMin) params.set('meopen_min', meopenMin)
-    if (meopenMax) params.set('meopen_max', meopenMax)
+    const meopen = parseFloat(meopenCenter)
+    if (!isNaN(meopen) && meopen > 0) {
+      const round2 = (n: number) => Math.round(n * 100) / 100
+      params.set('meopen_min', String(round2(meopen * (1 - SEARCH_CONFIG.meopenTolerance))))
+      params.set('meopen_max', String(round2(meopen * (1 + SEARCH_CONFIG.meopenTolerance))))
+    }
     const query = params.toString()
     router.push(query ? `/search?${query}` : '/search')
   }
@@ -127,16 +130,26 @@ export default function Home() {
                   ))}
                 </datalist>
               </div>
-              <RangeField
-                label="目開き"
-                unit="μm"
-                minValue={meopenMin}
-                maxValue={meopenMax}
-                onMinChange={setMeopenMin}
-                onMaxChange={setMeopenMax}
-                minPlaceholder="150"
-                maxPlaceholder="250"
-              />
+              <div className="w-full">
+                <label className="block text-xs font-medium text-stone-500 mb-1.5">
+                  目開き{' '}
+                  <span className="text-stone-400 font-normal">
+                    （±{Math.round(SEARCH_CONFIG.meopenTolerance * 100)}% を自動検索）
+                  </span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    placeholder="例: 200"
+                    value={meopenCenter}
+                    onChange={(e) => setMeopenCenter(e.target.value)}
+                    className="w-full h-10 pl-3 pr-10 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500 transition-colors duration-150"
+                  />
+                  <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-stone-400">
+                    μm
+                  </span>
+                </div>
+              </div>
             </div>
             <Button size="lg" className="w-full mt-4" onClick={handleQuickSearch}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

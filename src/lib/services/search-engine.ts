@@ -47,6 +47,12 @@ function matchesFilter(product: UnifiedProduct, filters: SearchFilter): boolean 
     if (!zaishitsu.includes(normalized)) return false
   }
 
+  if (filters.zaishitsu_list && filters.zaishitsu_list.length > 0) {
+    if (!product.zaishitsu) return false
+    const zaishitsu = normalizeString(product.zaishitsu)
+    if (!filters.zaishitsu_list.some((m) => normalizeString(m) === zaishitsu)) return false
+  }
+
   if (filters.meopen_um_min != null) {
     if (product.meopen_um == null || product.meopen_um < filters.meopen_um_min) return false
   }

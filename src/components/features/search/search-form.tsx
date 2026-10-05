@@ -4,7 +4,9 @@ import { useState } from 'react'
 import Input from '@/components/ui/input'
 import Button from '@/components/ui/button'
 import RangeField from '@/components/ui/range-field'
+import MultiSelect, { type MultiSelectOption } from '@/components/ui/multi-select'
 import type { SearchFilter } from '@/lib/types'
+import { SEARCH_CONFIG } from '@/lib/constants'
 import { STOCK_STATUS_LABEL, type StockStatus } from '@/lib/constants/stock-status'
 import { MATERIAL_PROPERTIES_SOURCE_LABEL, MATERIAL_PROPERTIES_SOURCE_URL } from '@/lib/constants/material-properties'
 
@@ -12,17 +14,30 @@ export interface SearchFormProps {
   onSearch: (filters: SearchFilter) => void
   /** Prefill values (e.g. from URL params) */
   initialFilters?: SearchFilter
-  /** Suggestions for the 材質 field */
-  materialOptions?: string[]
+  /** Options for the 材質 multi-select */
+  materialOptions?: MultiSelectOption[]
+}
+
+const round2 = (n: number) => Math.round(n * 100) / 100
+
+/** URL 由来の min/max（±25% の対称範囲）から中心値を復元する */
+function initialMeopenCenter(init: SearchFilter): string {
+  if (init.meopen_um_min != null && init.meopen_um_max != null) {
+    return String((init.meopen_um_min + init.meopen_um_max) / 2)
+  }
+  if (init.meopen_um_min != null) return String(init.meopen_um_min)
+  if (init.meopen_um_max != null) return String(init.meopen_um_max)
+  return ''
 }
 
 export default function SearchForm({ onSearch, initialFilters, materialOptions = [] }: SearchFormProps) {
   const init = initialFilters ?? {}
   const numStr = (v: number | undefined) => (v != null ? String(v) : '')
 
-  const [zaishitsu, setZaishitsu] = useState(init.zaishitsu ?? '')
-  const [meopenMin, setMeopenMin] = useState(numStr(init.meopen_um_min))
-  const [meopenMax, setMeopenMax] = useState(numStr(init.meopen_um_max))
+  const [materials, setMaterials] = useState<string[]>(
+    init.zaishitsu_list ?? (init.zaishitsu ? [init.zaishitsu] : []),
+  )
+  const [meopenCenter, setMeopenCenter] = useState(initialMeopenCenter(init))
   const [meshCountMin, setMeshCountMin] = useState('')
   const [meshCountMax, setMeshCountMax] = useState('')
   const [senkeiMin, setSenkeiMin] = useState('')
@@ -52,9 +67,12 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
   const handleSearch = () => {
     const filters: SearchFilter = {}
 
-    if (zaishitsu) filters.zaishitsu = zaishitsu
-    if (meopenMin) filters.meopen_um_min = parseFloat(meopenMin)
-    if (meopenMax) filters.meopen_um_max = parseFloat(meopenMax)
+    if (materials.length > 0) filters.zaishitsu_list = materials
+    const meopen = parseFloat(meopenCenter)
+    if (!isNaN(meopen) && meopen > 0) {
+      filters.meopen_um_min = round2(meopen * (1 - SEARCH_CONFIG.meopenTolerance))
+      filters.meopen_um_max = round2(meopen * (1 + SEARCH_CONFIG.meopenTolerance))
+    }
     if (meshCountMin) filters.mesh_count_min = parseFloat(meshCountMin)
     if (meshCountMax) filters.mesh_count_max = parseFloat(meshCountMax)
     if (senkeiMin) filters.senkei_um_min = parseFloat(senkeiMin)
@@ -77,9 +95,8 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
   }
 
   const handleClear = () => {
-    setZaishitsu('')
-    setMeopenMin('')
-    setMeopenMax('')
+    setMaterials([])
+    setMeopenCenter('')
     setMeshCountMin('')
     setMeshCountMax('')
     setSenkeiMin('')
@@ -106,39 +123,56 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
     if (e.key === 'Enter') handleSearch()
   }
 
+  const meopenValue = parseFloat(meopenCenter)
+  const meopenRange =
+    !isNaN(meopenValue) && meopenValue > 0
+      ? {
+          min: round2(meopenValue * (1 - SEARCH_CONFIG.meopenTolerance)),
+          max: round2(meopenValue * (1 + SEARCH_CONFIG.meopenTolerance)),
+        }
+      : null
+
   return (
     <div className="bg-white rounded-lg border border-stone-200/80 shadow-card">
       <div className="p-5" onKeyDown={handleKeyDown}>
         {/* Primary: the two fields that answer 90% of inquiries */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr_auto] gap-4 lg:items-end">
-          <div className="w-full">
-            <label className="block text-xs font-medium text-stone-500 mb-1.5">
-              材質 <span className="text-stone-400 font-normal">（任意）</span>
-            </label>
-            <input
-              type="text"
-              list="search-material-options"
-              placeholder="例: ナイロン、PET"
-              value={zaishitsu}
-              onChange={(e) => setZaishitsu(e.target.value)}
-              className="w-full h-10 px-3 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500 transition-colors duration-150"
-            />
-            <datalist id="search-material-options">
-              {materialOptions.map((m) => (
-                <option key={m} value={m} />
-              ))}
-            </datalist>
-          </div>
-          <RangeField
-            label="目開き"
-            unit="μm"
-            minValue={meopenMin}
-            maxValue={meopenMax}
-            onMinChange={setMeopenMin}
-            onMaxChange={setMeopenMax}
-            minPlaceholder="150"
-            maxPlaceholder="250"
+        <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr_auto] gap-4 lg:items-end">
+          <MultiSelect
+            label={
+              <>
+                材質 <span className="text-stone-400 font-normal">（複数選択可）</span>
+              </>
+            }
+            options={materialOptions}
+            selected={materials}
+            onChange={setMaterials}
+            placeholder="すべての材質"
           />
+          <div className="relative w-full">
+            <label className="block text-xs font-medium text-stone-500 mb-1.5">
+              目開き{' '}
+              <span className="text-stone-400 font-normal">
+                （±{Math.round(SEARCH_CONFIG.meopenTolerance * 100)}% を自動検索）
+              </span>
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                placeholder="例: 200"
+                value={meopenCenter}
+                onChange={(e) => setMeopenCenter(e.target.value)}
+                className="w-full h-10 pl-3 pr-10 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500 transition-colors duration-150"
+              />
+              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-stone-400">
+                μm
+              </span>
+            </div>
+            {meopenRange && (
+              <p className="absolute left-0 top-full mt-1 text-[11px] text-stone-400 whitespace-nowrap">
+                {meopenRange.min}〜{meopenRange.max} μm の範囲を検索します
+              </p>
+            )}
+          </div>
           <div className="flex gap-2">
             <Button variant="primary" size="md" onClick={handleSearch} className="flex-1 lg:flex-none lg:px-8">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
