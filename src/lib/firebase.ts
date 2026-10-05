@@ -6,6 +6,9 @@ const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? ''
 
 export const isFirebaseConfigured = projectId !== ''
 
+// デモ等で一時的にログインを求めない。'true' のときだけ有効（/api/products も同じ値を見る）
+export const isAuthDisabled = process.env.NEXT_PUBLIC_AUTH_DISABLED === 'true'
+
 let app: FirebaseApp | null = null
 let db: Firestore | null = null
 let auth: Auth | null = null

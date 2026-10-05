@@ -11,7 +11,7 @@ import {
   type User,
 } from 'firebase/auth'
 import { collection, getDocs, limit, query } from 'firebase/firestore'
-import { auth, db, isFirebaseConfigured } from '@/lib/firebase'
+import { auth, db, isAuthDisabled, isFirebaseConfigured } from '@/lib/firebase'
 import Button from '@/components/ui/button'
 import Input from '@/components/ui/input'
 import LoadingSpinner from '@/components/ui/loading-spinner'
@@ -54,11 +54,13 @@ async function checkAccess(): Promise<boolean> {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  // Firebase 未設定（ローカル開発）のときは認証を求めない。価格の編集もできない状態で動く
-  const [status, setStatus] = useState<AuthStatus>(isFirebaseConfigured ? 'checking' : 'allowed')
+  // Firebase 未設定（ローカル開発）と認証の一時無効化のときは、ログインを求めない
+  const [status, setStatus] = useState<AuthStatus>(
+    isFirebaseConfigured && !isAuthDisabled ? 'checking' : 'allowed',
+  )
 
   useEffect(() => {
-    if (!auth) return
+    if (!auth || isAuthDisabled) return
     return onAuthStateChanged(auth, async (u) => {
       setUser(u)
       if (!u) {

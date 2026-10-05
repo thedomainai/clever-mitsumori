@@ -27,8 +27,10 @@ async function isAllowed(idToken: string): Promise<boolean> {
 
 export async function GET(req: NextRequest) {
   const firebaseConfigured = !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-  // Firebase 未設定のローカル開発に限り素通しする（AuthGate と同じ扱い）
-  const skipAuth = !firebaseConfigured && process.env.NODE_ENV === 'development'
+  // Firebase 未設定のローカル開発と、認証の一時無効化（NEXT_PUBLIC_AUTH_DISABLED）のときは素通しする
+  const skipAuth =
+    (!firebaseConfigured && process.env.NODE_ENV === 'development') ||
+    process.env.NEXT_PUBLIC_AUTH_DISABLED === 'true'
 
   if (!skipAuth) {
     const header = req.headers.get('authorization')
