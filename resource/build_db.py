@@ -16,6 +16,7 @@ clv- 形式 (clv-n-2-1000-1) に変換して products と照合する。
 import csv
 import re
 import sqlite3
+import unicodedata
 from pathlib import Path
 
 from spec_parser import enrich_specs
@@ -91,6 +92,35 @@ def _should_exclude(r):
     return False
 
 
+# ---- 保管場所と仕入先（紐づけの見出しなし列に混在している） ----
+_LOCATIONS = {'2F', '3F', '3F(検品場)', '山所'}  # 山所は保管場所と推定（くればぁ様に確認中）
+# 半角カナ・全角英数は NFKC で揃えたうえで、同じ会社の表記ゆれを寄せる
+_SUPPLIER_ALIASES = {
+    '田中三次郎': '田中三次郎商店',
+    'SATTI': 'SAATI',
+    'NBC': 'NBCメッシュテック',
+    '旭化成アドバンス 大阪': '旭化成アドバンス',
+    'Beijig Hongye': 'Beijing Hongye',
+}
+
+
+def split_area(area):
+    """紐づけの area 列を (保管場所, 仕入先) に分ける。複数社は「/」区切りで返す。"""
+    a = unicodedata.normalize('NFKC', area or '').strip()
+    if not a:
+        return None, None
+    if a in _LOCATIONS:
+        return a, None
+    names = [n.strip() for n in re.split(r'/|または', a) if n.strip()]
+    return None, '/'.join(_SUPPLIER_ALIASES.get(n, n) for n in names)
+
+
+def blank_code(v):
+    """商品コード欄の空欄と「なし」を None にする。"""
+    s = (v or '').strip()
+    return None if s in ('', 'なし') else s
+
+
 def main():
     if DB.exists():
         DB.unlink()
@@ -114,6 +144,7 @@ def main():
         # サランネット N-24 → saran-N-24（トリカル N-24 と区別）
         if (r[8] or '').strip() == 'ｻﾗﾝﾈｯﾄ' and (r[9] or '').strip() == 'N-24':
             r[9] = 'saran-N-24'
+        r[0], r[2], r[3] = blank_code(r[0]), blank_code(r[2]), blank_code(r[3])
         cur.execute("INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     r + [norm(r[0]), norm(r[2]), norm(r[3])])
 
@@ -210,6 +241,25 @@ def main():
             cur.execute(f"UPDATE {table} SET hinban_n=? WHERE rowid=?",
                         (hinban_key(h), rowid))
 
+    # ---- EC品番（ec_hinban）: 商品を一意に指すキー。価格の上書き（Firestore）もこのキーで保存する ----
+    # Yahoo・楽天のコードは色違い等の親商品単位で共有されるため、SKU 単位で一意な Amazon SKU を優先する。
+    cur.execute("ALTER TABLE products ADD COLUMN ec_hinban TEXT")
+    used = set()
+    for rowid, amz, yah, rak in cur.execute(
+            "SELECT rowid, amazon_sku, yahoo_code, rakuten_code FROM products ORDER BY rowid").fetchall():
+        base = next((c.strip() for c in (amz, yah, rak) if c), f"row-{rowid}")
+        key, n = base, 2
+        while key.lower() in used:
+            key, n = f"{base}#{n}", n + 1
+        used.add(key.lower())
+        cur.execute("UPDATE products SET ec_hinban=? WHERE rowid=?", (key, rowid))
+
+    cur.execute("ALTER TABLE products ADD COLUMN hokan_basho TEXT")
+    cur.execute("ALTER TABLE products ADD COLUMN shiiresaki TEXT")
+    for rowid, area in cur.execute("SELECT rowid, area FROM products").fetchall():
+        cur.execute("UPDATE products SET hokan_basho=?, shiiresaki=? WHERE rowid=?",
+                    (*split_area(area), rowid))
+
     # ---- products に幅(mm)・カット長(m) を付与（サイズ "1400mm*1ｍ" から抽出） ----
     # サイズ欄が空欄の行はシステム下段カラム（同形式）をフォールバックに使う。
     # 「50ｍ」のような長さのみの表記は cut_m だけ取り、幅は取らない。
@@ -241,8 +291,27 @@ def main():
     DEFAULT_ARARI = 0.5    # 粗利率
     DEFAULT_KOTEIHI = 6000  # 固定費（円）
 
+    # ---- 幅の近い在庫ロット（品番一致・幅の差が商品幅の 5% 以内。耳込み 1020mm と 1000mm 等） ----
+    # 幅が大きく違うロットは m 単価が違うため照合しない（以前は幅を見ずに照合していた）
+    NEAR_WIDTH = 0.05
+    cur.execute("CREATE TABLE zaiko_near (prod_rowid INTEGER, hinban_u TEXT, haba_mm TEXT)")
+    widths = {}
+    for hn, w in cur.execute(
+            "SELECT DISTINCT hinban_n, haba_mm FROM zaiko WHERE hinban_n IS NOT NULL").fetchall():
+        if to_num(w):
+            widths.setdefault(hn, []).append((to_num(w), w))
+    for rowid, hn, w in cur.execute(
+            "SELECT rowid, hinban_n, haba_mm FROM products WHERE hinban_n IS NOT NULL").fetchall():
+        pw = to_num(w)
+        if not pw or hn not in widths:
+            continue
+        cands = [(abs(zw - pw), raw) for zw, raw in widths[hn]
+                 if raw != w and abs(zw - pw) <= pw * NEAR_WIDTH]
+        if cands:
+            cur.execute("INSERT INTO zaiko_near VALUES (?,?,?)", (rowid, hn, min(cands)[1]))
+
     # ---- 統合ビュー ----
-    # 仕入値の照合は2段階: (1)共通キー一致 (2)品番+幅一致
+    # 仕入値の照合は3段階: (1)共通キー一致 (2)品番+幅一致 (3)品番一致・幅の差 5% 以内
     cur.execute("""CREATE VIEW zaiko_agg AS
         SELECT key, hinban_n AS hinban_u, haba_mm,
                MAX(shiire_per_m) AS shiire_per_m,
@@ -252,7 +321,7 @@ def main():
         FROM zaiko GROUP BY key, hinban_n, haba_mm""")
     cur.execute(f"""CREATE VIEW unified AS
         SELECT
-            COALESCE(p.yahoo_code, p.amazon_sku, p.rakuten_code) AS ec_hinban,
+            p.ec_hinban AS ec_hinban,
             p.rakuten_code, p.yahoo_code, p.amazon_sku, p.asin,
             p.zaishitsu, p.hinban, p.color, p.size, p.tehai,
             CAST(p.haba_mm AS REAL) AS haba_mm,
@@ -291,7 +360,7 @@ def main():
             END AS kaikouritsu,
             CASE WHEN zk.key IS NOT NULL THEN 'key'
                  WHEN zh.hinban_u IS NOT NULL THEN 'hinban+haba'
-                 WHEN zs.hinban_u IS NOT NULL THEN 'hinban' END AS zaiko_match,
+                 WHEN zs.hinban_u IS NOT NULL THEN 'hinban+haba近似' END AS zaiko_match,
             CASE
                 WHEN zk.key IS NOT NULL OR zh.hinban_u IS NOT NULL
                      OR zs.hinban_u IS NOT NULL THEN '突合OK'
@@ -303,7 +372,8 @@ def main():
                           ELSE '幅不一致' END
                 WHEN TRIM(COALESCE(p.tehai, '')) = '在庫' THEN '在庫表に品番なし'
                 ELSE '在庫表対象外(EC専売等)'
-            END AS zaiko_status
+            END AS zaiko_status,
+            p.hokan_basho, p.shiiresaki
         FROM products p
         LEFT JOIN rakuten_prices r ON r.key = p.rakuten_key
         LEFT JOIN yahoo_prices   y ON y.key = p.yahoo_key
@@ -323,15 +393,16 @@ def main():
                    FROM zaiko WHERE hinban IS NOT NULL GROUP BY 1, 2
         ) zh ON zh.hinban_u = p.hinban_n
             AND zh.haba_mm = p.haba_mm AND zk.key IS NULL
-        LEFT JOIN (SELECT hinban_n AS hinban_u,
+        LEFT JOIN zaiko_near zn ON zn.prod_rowid = p.rowid
+            AND zk.key IS NULL AND zh.hinban_u IS NULL
+        LEFT JOIN (SELECT hinban_n AS hinban_u, haba_mm,
                           MAX(shiire_per_m) AS shiire_per_m,
                           SUM(nokori_m) AS nokori_m, MIN(source) AS source,
                           MAX(meopen_um) AS meopen_um,
                           MAX(mesh_count) AS mesh_count,
-                          MAX(CAST(haba_mm AS REAL)) AS zaiko_haba_mm
-                   FROM zaiko WHERE hinban IS NOT NULL GROUP BY 1
-        ) zs ON zs.hinban_u = p.hinban_n
-            AND zk.key IS NULL AND zh.hinban_u IS NULL""")
+                          CAST(haba_mm AS REAL) AS zaiko_haba_mm
+                   FROM zaiko WHERE hinban IS NOT NULL GROUP BY 1, 2
+        ) zs ON zs.hinban_u = zn.hinban_u AND zs.haba_mm = zn.haba_mm""")
 
     con.commit()
 

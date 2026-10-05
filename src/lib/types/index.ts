@@ -60,6 +60,10 @@ export type UnifiedProduct = {
   senkei_yoko_um?: number
   /** 濾過粒度 μm（畳織。商品名の「粒球子」） */
   roka_ryudo_um?: number
+  /** 保管場所（2F / 3F 等）。紐づけの見出しなし列から仕入先と分けたもの */
+  hokan_basho?: string
+  /** 仕入先（表記ゆれを寄せた名前。複数社は「/」区切り） */
+  shiiresaki?: string
 }
 
 // User-editable overrides stored in Firestore

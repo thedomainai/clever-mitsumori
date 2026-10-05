@@ -71,6 +71,8 @@ COLUMNS = [
     ("meopen_yoko_um", to_num),
     ("senkei_yoko_um", to_num),
     ("roka_ryudo_um", to_num),
+    ("hokan_basho", to_str),
+    ("shiiresaki", to_str),
 ]
 
 
@@ -81,12 +83,18 @@ def main():
         reader = csv.reader(fp)
         headers = next(reader)
 
+        # 列の並びではなく見出し名で対応づける（build_db.py 側で列を足しても崩れない）
+        idx = {h: i for i, h in enumerate(headers)}
+        missing = [k for k, _ in COLUMNS if k not in idx]
+        if missing:
+            raise SystemExit(f"unified.csv に列がありません: {missing}")
+
         products = []
         for row in reader:
-            row = (row + [None] * len(COLUMNS))[:len(COLUMNS)]
             obj = {}
-            for i, (key, conv) in enumerate(COLUMNS):
-                val = conv(row[i])
+            for key, conv in COLUMNS:
+                i = idx[key]
+                val = conv(row[i] if i < len(row) else None)
                 if val is not None:
                     obj[key] = val
             if obj.get("ec_hinban"):
