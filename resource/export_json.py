@@ -66,6 +66,7 @@ COLUMNS = [
     ("kaikouritsu", to_num),
     ("zaiko_match", to_str),
     ("zaiko_status", to_str),
+    ("spec_source", to_str),
 ]
 
 

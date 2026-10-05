@@ -27,6 +27,8 @@ export type UnifiedProduct = {
   color?: string
   size?: string
   tehai?: string
+  /** EC 商品の幅（サイズ表記 "1080mm*1ｍ" から抽出） */
+  haba_mm?: number
   cut_m?: number
   arari_rate?: number
   kotei_hi?: number
@@ -49,6 +51,8 @@ export type UnifiedProduct = {
   kaikouritsu?: number
   zaiko_match?: string
   zaiko_status?: string
+  /** 仕様（目開き・メッシュ数・線径）の出どころ: 在庫表 / Amazon商品名 / 品番 */
+  spec_source?: string
 }
 
 // User-editable overrides stored in Firestore

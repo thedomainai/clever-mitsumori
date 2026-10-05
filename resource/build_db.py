@@ -18,6 +18,8 @@ import re
 import sqlite3
 from pathlib import Path
 
+from spec_parser import enrich_specs
+
 BASE = Path(__file__).parent
 DB = BASE / "clever.db"
 
@@ -327,13 +329,28 @@ def main():
     for k, v in stats.items():
         print(f"{k}: {v}")
 
+    # ---- 仕様の補完（在庫表 > Amazon 商品名 > 品番。詳細は spec_parser.py） ----
+    titles = {}
+    for r in read_csv("ec-hanbai-kanrihyou_アマゾン.csv")[2:]:
+        r = (r + [None] * 3)[:3]
+        if norm(r[0]) and r[2]:
+            titles[norm(r[0])] = r[2]
+
     out = BASE / "unified.csv"
     cur.execute("SELECT * FROM unified")
     cols = [d[0] for d in cur.description]
+    enriched = []
+    for values in cur.fetchall():
+        row = dict(zip(cols, values))
+        title = titles.get(norm(row["amazon_sku"])) or titles.get(norm(row["ec_hinban"])) or ""
+        enriched.append(enrich_specs(row, title))
+    out_cols = cols + ["spec_source"]
     with open(out, "w", newline="", encoding="utf-8-sig") as fp:
         w = csv.writer(fp)
-        w.writerow(cols)
-        w.writerows(cur.fetchall())
+        w.writerow(out_cols)
+        w.writerows([[r.get(c) for c in out_cols] for r in enriched])
+    n_spec = sum(1 for r in enriched if r["meopen_um"] is not None or r["mesh_count"] is not None)
+    print(f"unified.仕様あり: {n_spec}")
     print(f"export: {out.name}")
     con.close()
 
