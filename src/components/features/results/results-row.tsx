@@ -67,10 +67,14 @@ export default function ResultsRow({ result, override, onSaveOverride, canEdit, 
         {product.meopen_um != null ? `${product.meopen_um}` : '-'}
       </TableCell>
       <TableCell className="text-right tabular-nums">
-        {product.mesh_count != null ? `${product.mesh_count}` : '-'}
+        {product.mesh_count != null
+          ? product.mesh_count_yoko != null ? `${product.mesh_count}/${product.mesh_count_yoko}` : `${product.mesh_count}`
+          : '-'}
       </TableCell>
       <TableCell className="text-right tabular-nums">
-        {product.senkei_um != null ? `${product.senkei_um}` : '-'}
+        {product.senkei_um != null
+          ? product.senkei_yoko_um != null ? `${product.senkei_um}/${product.senkei_yoko_um}` : `${product.senkei_um}`
+          : '-'}
       </TableCell>
       <TableCell className="text-right tabular-nums">
         {product.kaikouritsu != null ? `${product.kaikouritsu}` : '-'}

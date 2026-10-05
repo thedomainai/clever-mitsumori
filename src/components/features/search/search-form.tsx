@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Input from '@/components/ui/input'
 import Button from '@/components/ui/button'
 import RangeField from '@/components/ui/range-field'
+import PairField from '@/components/ui/pair-field'
 import MultiSelect, { type MultiSelectOption } from '@/components/ui/multi-select'
 import type { SearchFilter } from '@/lib/types'
 import { SEARCH_CONFIG } from '@/lib/constants'
@@ -19,6 +20,13 @@ export interface SearchFormProps {
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100
+
+/** 中心値から ±tolerance の範囲を作る。空・不正値なら null */
+function toleranceRange(value: string, tolerance: number): { min: number; max: number } | null {
+  const v = parseFloat(value)
+  if (isNaN(v) || v <= 0) return null
+  return { min: round2(v * (1 - tolerance)), max: round2(v * (1 + tolerance)) }
+}
 
 /** URL 由来の min/max（±25% の対称範囲）から中心値を復元する */
 function initialMeopenCenter(init: SearchFilter): string {
@@ -38,10 +46,11 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
     init.zaishitsu_list ?? (init.zaishitsu ? [init.zaishitsu] : []),
   )
   const [meopenCenter, setMeopenCenter] = useState(initialMeopenCenter(init))
-  const [meshCountMin, setMeshCountMin] = useState('')
-  const [meshCountMax, setMeshCountMax] = useState('')
-  const [senkeiMin, setSenkeiMin] = useState('')
-  const [senkeiMax, setSenkeiMax] = useState('')
+  // メッシュ数・線径は縦/横の値（下限/上限ではない）
+  const [meshTate, setMeshTate] = useState('')
+  const [meshYoko, setMeshYoko] = useState('')
+  const [senkeiTate, setSenkeiTate] = useState('')
+  const [senkeiYoko, setSenkeiYoko] = useState('')
   const [kaikouritsuMin, setKaikouritsuMin] = useState('')
   const [kaikouritsuMax, setKaikouritsuMax] = useState('')
   const [habaMin, setHabaMin] = useState('')
@@ -58,7 +67,7 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
   const [advancedOpen, setAdvancedOpen] = useState(false)
 
   const advancedValues = [
-    meshCountMin, meshCountMax, senkeiMin, senkeiMax,
+    meshTate, meshYoko, senkeiTate, senkeiYoko,
     kaikouritsuMin, kaikouritsuMax, habaMin, habaMax,
     hinban, ecHinban, color, freeText,
   ]
@@ -73,10 +82,15 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
       filters.meopen_um_min = round2(meopen * (1 - SEARCH_CONFIG.meopenTolerance))
       filters.meopen_um_max = round2(meopen * (1 + SEARCH_CONFIG.meopenTolerance))
     }
-    if (meshCountMin) filters.mesh_count_min = parseFloat(meshCountMin)
-    if (meshCountMax) filters.mesh_count_max = parseFloat(meshCountMax)
-    if (senkeiMin) filters.senkei_um_min = parseFloat(senkeiMin)
-    if (senkeiMax) filters.senkei_um_max = parseFloat(senkeiMax)
+    const tol = SEARCH_CONFIG.specTolerance
+    const meshT = toleranceRange(meshTate, tol)
+    if (meshT) { filters.mesh_count_min = meshT.min; filters.mesh_count_max = meshT.max }
+    const meshY = toleranceRange(meshYoko, tol)
+    if (meshY) { filters.mesh_count_yoko_min = meshY.min; filters.mesh_count_yoko_max = meshY.max }
+    const senkeiT = toleranceRange(senkeiTate, tol)
+    if (senkeiT) { filters.senkei_um_min = senkeiT.min; filters.senkei_um_max = senkeiT.max }
+    const senkeiY = toleranceRange(senkeiYoko, tol)
+    if (senkeiY) { filters.senkei_yoko_um_min = senkeiY.min; filters.senkei_yoko_um_max = senkeiY.max }
     if (kaikouritsuMin) filters.kaikouritsu_min = parseFloat(kaikouritsuMin)
     if (kaikouritsuMax) filters.kaikouritsu_max = parseFloat(kaikouritsuMax)
     if (habaMin) filters.zaiko_haba_mm_min = parseFloat(habaMin)
@@ -97,10 +111,10 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
   const handleClear = () => {
     setMaterials([])
     setMeopenCenter('')
-    setMeshCountMin('')
-    setMeshCountMax('')
-    setSenkeiMin('')
-    setSenkeiMax('')
+    setMeshTate('')
+    setMeshYoko('')
+    setSenkeiTate('')
+    setSenkeiYoko('')
     setKaikouritsuMin('')
     setKaikouritsuMax('')
     setHabaMin('')
@@ -288,20 +302,22 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
 
           {advancedOpen && (
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in-up">
-              <RangeField
+              <PairField
                 label="メッシュ数"
-                minValue={meshCountMin}
-                maxValue={meshCountMax}
-                onMinChange={setMeshCountMin}
-                onMaxChange={setMeshCountMax}
+                tateValue={meshTate}
+                yokoValue={meshYoko}
+                onTateChange={setMeshTate}
+                onYokoChange={setMeshYoko}
+                hint={`例: 畳織 635 / 4300。各 ±${Math.round(SEARCH_CONFIG.specTolerance * 100)}% を検索`}
               />
-              <RangeField
+              <PairField
                 label="線径"
                 unit="μm"
-                minValue={senkeiMin}
-                maxValue={senkeiMax}
-                onMinChange={setSenkeiMin}
-                onMaxChange={setSenkeiMax}
+                tateValue={senkeiTate}
+                yokoValue={senkeiYoko}
+                onTateChange={setSenkeiTate}
+                onYokoChange={setSenkeiYoko}
+                hint="横が空なら縦だけで検索"
               />
               <RangeField
                 label="開口率"

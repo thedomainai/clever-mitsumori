@@ -85,6 +85,11 @@ export type SearchFilter = {
   mesh_count_max?: number
   senkei_um_min?: number
   senkei_um_max?: number
+  /** 横のメッシュ数・線径。商品に横の値が無ければ縦の値（正方目）と比べる */
+  mesh_count_yoko_min?: number
+  mesh_count_yoko_max?: number
+  senkei_yoko_um_min?: number
+  senkei_yoko_um_max?: number
   kaikouritsu_min?: number
   kaikouritsu_max?: number
   zaiko_haba_mm_min?: number

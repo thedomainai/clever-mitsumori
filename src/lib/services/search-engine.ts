@@ -77,6 +77,25 @@ function matchesFilter(product: UnifiedProduct, filters: SearchFilter): boolean 
     if (product.senkei_um == null || product.senkei_um > filters.senkei_um_max) return false
   }
 
+  // 横: 商品に横の値が無いときは縦と同じ（正方目）とみなす
+  const meshYoko = product.mesh_count_yoko ?? product.mesh_count
+  if (filters.mesh_count_yoko_min != null) {
+    if (meshYoko == null || meshYoko < filters.mesh_count_yoko_min) return false
+  }
+
+  if (filters.mesh_count_yoko_max != null) {
+    if (meshYoko == null || meshYoko > filters.mesh_count_yoko_max) return false
+  }
+
+  const senkeiYoko = product.senkei_yoko_um ?? product.senkei_um
+  if (filters.senkei_yoko_um_min != null) {
+    if (senkeiYoko == null || senkeiYoko < filters.senkei_yoko_um_min) return false
+  }
+
+  if (filters.senkei_yoko_um_max != null) {
+    if (senkeiYoko == null || senkeiYoko > filters.senkei_yoko_um_max) return false
+  }
+
   if (filters.kaikouritsu_min != null) {
     if (product.kaikouritsu == null || product.kaikouritsu < filters.kaikouritsu_min) return false
   }

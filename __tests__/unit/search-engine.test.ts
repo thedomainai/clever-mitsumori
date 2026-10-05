@@ -85,6 +85,32 @@ describe('searchProducts', () => {
     expect(result.data.results).toHaveLength(4)
   })
 
+  describe('warp/weft (縦/横) filters', () => {
+    const woven: UnifiedProduct[] = [
+      createProduct({ ec_hinban: 'TO-01', zaishitsu: 'SUS316畳織', mesh_count: 635, mesh_count_yoko: 4300, senkei_um: 20, senkei_yoko_um: 16 }),
+      createProduct({ ec_hinban: 'TO-02', zaishitsu: 'SUS316畳織', mesh_count: 635, mesh_count_yoko: 3600 }),
+      createProduct({ ec_hinban: 'PW-01', zaishitsu: 'SUS304', mesh_count: 635, senkei_um: 20 }),
+    ]
+
+    it('should match warp and weft mesh counts separately', () => {
+      const result = searchProducts(woven, { mesh_count_min: 600, mesh_count_max: 670, mesh_count_yoko_min: 4085, mesh_count_yoko_max: 4515 })
+      if (!result.success) throw new Error('search failed')
+      expect(result.data.results.map((r) => r.product.ec_hinban)).toEqual(['TO-01'])
+    })
+
+    it('should treat a missing weft value as equal to the warp value', () => {
+      const result = searchProducts(woven, { mesh_count_yoko_min: 600, mesh_count_yoko_max: 670 })
+      if (!result.success) throw new Error('search failed')
+      expect(result.data.results.map((r) => r.product.ec_hinban)).toEqual(['PW-01'])
+    })
+
+    it('should filter weft wire diameter', () => {
+      const result = searchProducts(woven, { senkei_yoko_um_min: 15, senkei_yoko_um_max: 17 })
+      if (!result.success) throw new Error('search failed')
+      expect(result.data.results.map((r) => r.product.ec_hinban)).toEqual(['TO-01'])
+    })
+  })
+
   it('should filter by hinban partial match', () => {
     const filter: SearchFilter = { hinban: 'M-' }
     const result = searchProducts(products, filter)
