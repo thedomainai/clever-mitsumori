@@ -18,13 +18,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantClasses: Record<ButtonVariant, string> = {
       primary:
-        'bg-stone-900 hover:bg-stone-700 active:bg-stone-950 text-white shadow-card focus-visible:outline-stone-900',
+        'bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white shadow-card focus-visible:outline-indigo-600',
       secondary:
-        'bg-white ring-1 ring-inset ring-stone-300 hover:bg-stone-50 active:bg-stone-100 text-stone-700 focus-visible:outline-stone-900',
+        'bg-white ring-1 ring-inset ring-stone-300 hover:bg-stone-50 active:bg-stone-100 text-stone-700 focus-visible:outline-indigo-600',
       danger:
         'bg-red-600 hover:bg-red-500 active:bg-red-700 text-white shadow-card focus-visible:outline-red-600',
       ghost:
-        'hover:bg-stone-100 active:bg-stone-200 text-stone-600 focus-visible:outline-stone-900',
+        'hover:bg-stone-100 active:bg-stone-200 text-stone-600 focus-visible:outline-indigo-600',
     }
 
     const sizeClasses: Record<ButtonSize, string> = {

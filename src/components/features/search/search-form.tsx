@@ -161,7 +161,7 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
                 placeholder="例: 200"
                 value={meopenCenter}
                 onChange={(e) => setMeopenCenter(e.target.value)}
-                className="w-full h-10 pl-3 pr-10 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500 transition-colors duration-150"
+                className="w-full h-10 pl-3 pr-10 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-indigo-500 transition-colors duration-150"
               />
               <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-stone-400">
                 μm
@@ -231,7 +231,7 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
                   placeholder="例: 150"
                   value={heatMin}
                   onChange={(e) => setHeatMin(e.target.value)}
-                  className="w-28 h-8 pl-3 pr-8 text-xs rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500 transition-colors duration-150"
+                  className="w-28 h-8 pl-3 pr-8 text-xs rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-indigo-500 transition-colors duration-150"
                 />
                 <span className="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-[11px] text-stone-400">
                   ℃以上
@@ -248,7 +248,7 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
                   onClick={() => setChecked(!checked)}
                   className={`h-8 px-3 rounded-md text-xs font-medium ring-1 ring-inset transition-colors ${
                     checked
-                      ? 'bg-stone-900 text-white ring-stone-900'
+                      ? 'bg-indigo-600 text-white ring-indigo-600'
                       : 'bg-white text-stone-600 ring-stone-300 hover:bg-stone-50'
                   }`}
                 >
@@ -280,7 +280,7 @@ export default function SearchForm({ onSearch, initialFilters, materialOptions =
             </svg>
             詳細条件
             {!advancedOpen && activeAdvancedCount > 0 && (
-              <span className="ml-1 px-1.5 py-0.5 bg-stone-900 text-white text-[10px] font-semibold rounded-full leading-none">
+              <span className="ml-1 px-1.5 py-0.5 bg-indigo-600 text-white text-[10px] font-semibold rounded-full leading-none">
                 {activeAdvancedCount}
               </span>
             )}

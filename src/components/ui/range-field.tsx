@@ -30,7 +30,7 @@ export default function RangeField({
     w-full h-10 min-w-0 px-3 text-sm rounded-lg border border-stone-300 bg-white
     placeholder:text-stone-400
     hover:border-stone-400
-    focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500
+    focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-indigo-500
     transition-colors duration-150
     ${unit ? 'pr-9' : ''}
   `

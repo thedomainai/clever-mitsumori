@@ -17,7 +17,7 @@ export default function LoadingSpinner({ size = 'md', label, className = '' }: L
   return (
     <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
       <div
-        className={`${sizeClasses[size]} border-stone-300 border-t-stone-900 rounded-full animate-spin`}
+        className={`${sizeClasses[size]} border-stone-300 border-t-indigo-600 rounded-full animate-spin`}
       />
       {label && <p className="text-sm text-stone-500">{label}</p>}
     </div>

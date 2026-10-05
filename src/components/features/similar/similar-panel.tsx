@@ -109,7 +109,7 @@ const SimilarPanel = forwardRef<HTMLDivElement, SimilarPanelProps>(function Simi
                 placeholder="例: 120"
                 value={heatMin}
                 onChange={(e) => setHeatMin(e.target.value)}
-                className="w-36 h-10 pl-3 pr-14 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500"
+                className="w-36 h-10 pl-3 pr-14 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-indigo-500"
               />
               <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-stone-400">℃以上</span>
             </span>
@@ -122,7 +122,7 @@ const SimilarPanel = forwardRef<HTMLDivElement, SimilarPanelProps>(function Simi
                 placeholder="例: 420"
                 value={minWidth}
                 onChange={(e) => setMinWidth(e.target.value)}
-                className="w-36 h-10 pl-3 pr-14 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500"
+                className="w-36 h-10 pl-3 pr-14 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-indigo-500"
               />
               <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-stone-400">mm以上</span>
             </span>

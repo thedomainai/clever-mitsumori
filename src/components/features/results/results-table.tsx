@@ -106,7 +106,7 @@ export default function ResultsTable({
           </span>
           {overrideCount > 0 && (
             <span className="ml-3 inline-flex items-center gap-1.5 text-stone-600">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500" />
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500" />
               {overrideCount}件 編集済み
             </span>
           )}

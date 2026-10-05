@@ -25,7 +25,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               w-full h-10 px-3 text-sm rounded-lg border bg-white
               placeholder:text-stone-400
               hover:border-stone-400
-              focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500
+              focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-indigo-500
               disabled:bg-stone-50 disabled:text-stone-400 disabled:cursor-not-allowed
               transition-colors duration-150
               ${suffix ? 'pr-10' : ''}

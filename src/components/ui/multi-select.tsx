@@ -70,7 +70,7 @@ export default function MultiSelect({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="w-full min-h-10 pl-2 pr-3 py-1 flex flex-wrap items-center gap-1 text-sm text-left rounded-lg border border-stone-300 bg-white hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500 transition-colors duration-150"
+        className="w-full min-h-10 pl-2 pr-3 py-1 flex flex-wrap items-center gap-1 text-sm text-left rounded-lg border border-stone-300 bg-white hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-indigo-500 transition-colors duration-150"
       >
         {selected.length === 0 ? (
           <span className="px-1 text-stone-400">{placeholder}</span>
@@ -118,7 +118,7 @@ export default function MultiSelect({
               placeholder="材質名で絞り込み"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full h-8 px-2.5 text-sm rounded-md border border-stone-200 bg-stone-50 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-400"
+              className="w-full h-8 px-2.5 text-sm rounded-md border border-stone-200 bg-stone-50 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-stone-400"
             />
           </div>
           <ul className="max-h-60 overflow-y-auto py-1">
@@ -137,7 +137,7 @@ export default function MultiSelect({
                     <span
                       className={`w-4 h-4 inline-flex items-center justify-center rounded border flex-shrink-0 ${
                         checked
-                          ? 'bg-stone-900 border-stone-900 text-white'
+                          ? 'bg-indigo-600 border-indigo-600 text-white'
                           : 'border-stone-300 bg-white text-transparent'
                       }`}
                     >

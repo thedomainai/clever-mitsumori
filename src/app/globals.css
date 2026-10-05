@@ -11,7 +11,7 @@
   }
 
   ::selection {
-    @apply bg-stone-900 text-white;
+    @apply bg-indigo-600 text-white;
   }
 
   /* Thin scrollbars for wide tables */

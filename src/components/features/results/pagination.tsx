@@ -73,7 +73,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
             className={`
               min-w-9 h-9 px-2 text-sm font-medium rounded-md tabular-nums transition-colors duration-150
               ${isActive
-                ? 'bg-stone-900 text-white'
+                ? 'bg-indigo-600 text-white'
                 : 'text-stone-600 hover:bg-stone-200/60'
               }
             `}

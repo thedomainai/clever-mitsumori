@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <header className="sticky top-0 z-40 bg-canvas/90 backdrop-blur-md border-b border-stone-200/70">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2.5 group">
-                <div className="w-7 h-7 bg-stone-900 rounded-md flex items-center justify-center transition-transform duration-150 group-hover:scale-105">
+                <div className="w-7 h-7 bg-indigo-600 rounded-md flex items-center justify-center transition-transform duration-150 group-hover:scale-105">
                   <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
                   </svg>
@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150
                       ${
                         pathname === item.href
-                          ? 'bg-stone-900 text-white'
+                          ? 'bg-indigo-600 text-white'
                           : 'text-stone-500 hover:text-stone-900 hover:bg-stone-200/60'
                       }
                     `}

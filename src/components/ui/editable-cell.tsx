@@ -105,7 +105,7 @@ export default function EditableCell({
             onChange={(e) => setDraft(e.target.value)}
             onBlur={commit}
             onKeyDown={handleKeyDown}
-            className="w-24 h-8 px-2 text-right text-sm tabular-nums border border-stone-400 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500"
+            className="w-24 h-8 px-2 text-right text-sm tabular-nums border border-stone-400 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-indigo-500"
           />
           {inputSuffix && (
             <span className="text-xs text-stone-400">{inputSuffix}</span>
@@ -121,7 +121,7 @@ export default function EditableCell({
       className={`
         group/cell px-4 py-2.5 text-right tabular-nums text-sm whitespace-nowrap cursor-pointer
         hover:bg-stone-100/80 transition-colors
-        ${isOverridden ? 'text-blue-700 font-medium' : 'text-stone-600'}
+        ${isOverridden ? 'text-indigo-700 font-medium' : 'text-stone-600'}
         ${className}
       `}
       title={isOverridden ? '編集済み（クリックで変更）' : 'クリックで編集'}
@@ -130,13 +130,13 @@ export default function EditableCell({
         className={`
           inline-flex items-center gap-1.5
           underline decoration-dotted underline-offset-4
-          ${isOverridden ? 'decoration-blue-300' : 'decoration-stone-300 group-hover/cell:decoration-stone-500'}
+          ${isOverridden ? 'decoration-indigo-300' : 'decoration-stone-300 group-hover/cell:decoration-stone-500'}
           transition-colors
         `}
       >
         {format(value)}
         {isOverridden && (
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
         )}
       </span>
     </td>

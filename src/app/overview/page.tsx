@@ -318,7 +318,7 @@ export default function OverviewPage() {
               <div className="p-5 bg-white border border-stone-200 rounded-lg">
                 <div className="flex items-center gap-2 mb-3">
                   <h4 className="text-base font-bold text-stone-900">見積もり単価リスト</h4>
-                  <span className="px-2 py-0.5 bg-stone-900 text-white text-[10px] font-bold rounded">MVP</span>
+                  <span className="px-2 py-0.5 bg-indigo-600 text-white text-[10px] font-bold rounded">MVP</span>
                 </div>
                 <p className="text-xs text-stone-500 mb-4">
                   営業が商品名/規格を入力 → 単価・在庫・代替品を即座に確認。見積書システム（トラックス）とは非連携。リスト表示。
@@ -483,7 +483,7 @@ export default function OverviewPage() {
 function SectionHeader({ number, title, subtitle }: { number: string; title: string; subtitle: string }) {
   return (
     <div className="flex items-baseline gap-3">
-      <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-stone-900 text-white text-xs font-bold flex items-center justify-center">{number}</span>
+      <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">{number}</span>
       <div>
         <h2 className="text-lg font-bold text-stone-900">{title}</h2>
         <p className="text-sm text-stone-500">{subtitle}</p>

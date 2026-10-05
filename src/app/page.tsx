@@ -122,7 +122,7 @@ export default function Home() {
                   placeholder="例: ナイロン、PET"
                   value={zaishitsu}
                   onChange={(e) => setZaishitsu(e.target.value)}
-                  className="w-full h-10 px-3 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500 transition-colors duration-150"
+                  className="w-full h-10 px-3 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-indigo-500 transition-colors duration-150"
                 />
                 <datalist id="material-options">
                   {materialOptions.map((m) => (
@@ -143,7 +143,7 @@ export default function Home() {
                     placeholder="例: 200"
                     value={meopenCenter}
                     onChange={(e) => setMeopenCenter(e.target.value)}
-                    className="w-full h-10 pl-3 pr-10 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-500 transition-colors duration-150"
+                    className="w-full h-10 pl-3 pr-10 text-sm rounded-lg border border-stone-300 bg-white placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/15 focus:border-indigo-500 transition-colors duration-150"
                   />
                   <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-stone-400">
                     μm
@@ -206,7 +206,7 @@ export default function Home() {
           <div className="bg-white rounded-lg border border-stone-200/80 shadow-card p-4">
             <div className="flex items-center justify-between">
               <p className="text-xs font-medium text-stone-500">メッシュ</p>
-              <span className="px-2 py-0.5 bg-stone-900 text-white text-[10px] font-medium rounded-full">
+              <span className="px-2 py-0.5 bg-indigo-600 text-white text-[10px] font-medium rounded-full">
                 対応済み
               </span>
             </div>
